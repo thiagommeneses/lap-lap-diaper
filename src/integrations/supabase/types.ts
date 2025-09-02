@@ -92,13 +92,6 @@ export type Database = {
             referencedRelation: "diaper_age_groups"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "diaper_donations_age_group_id_fkey"
-            columns: ["age_group_id"]
-            isOneToOne: false
-            referencedRelation: "donation_summary"
-            referencedColumns: ["age_group_id"]
-          },
         ]
       }
       diaper_stock: {
@@ -131,13 +124,6 @@ export type Database = {
             referencedRelation: "diaper_age_groups"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "diaper_stock_age_group_id_fkey"
-            columns: ["age_group_id"]
-            isOneToOne: false
-            referencedRelation: "donation_summary"
-            referencedColumns: ["age_group_id"]
-          },
         ]
       }
       profiles: {
@@ -169,19 +155,19 @@ export type Database = {
       }
     }
     Views: {
-      donation_summary: {
-        Row: {
-          age_group_id: string | null
-          age_group_name: string | null
-          last_donation_date: string | null
-          total_donations: number | null
-          total_quantity: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_donation_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          age_group_id: string
+          age_group_name: string
+          last_donation_date: string
+          total_donations: number
+          total_quantity: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

@@ -39,17 +39,36 @@ export const useDiaperData = () => {
 
       if (ageGroupsError) throw ageGroupsError;
 
-      // Buscar doações recentes
-      const { data: donationsData, error: donationsError } = await supabase
-        .from('diaper_donations')
-        .select(`
-          *,
-          diaper_age_groups(name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (donationsError) throw donationsError;
+      // SEGURANÇA: Não tentar buscar detalhes de doações para usuários não autenticados
+      // Apenas administradores podem ver informações pessoais dos doadores
+      let donationsData = [];
+      try {
+        const { data: user } = await supabase.auth.getUser();
+        if (user.user) {
+          // Verificar se é admin antes de tentar buscar doações
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.user.id)
+            .single();
+          
+          if (profile?.is_admin) {
+            const { data: adminDonations } = await supabase
+              .from('diaper_donations')
+              .select(`
+                *,
+                diaper_age_groups(name)
+              `)
+              .order('created_at', { ascending: false })
+              .limit(10);
+            
+            donationsData = adminDonations || [];
+          }
+        }
+      } catch (donationError) {
+        // Erro esperado para usuários não administradores - silenciar
+        console.log('Acesso a doações restrito (comportamento normal para usuários públicos)');
+      }
 
       // Formatar dados dos grupos de idade
       const formattedAgeGroups: AgeGroupWithStock[] = (ageGroupsData || []).map(group => ({
@@ -63,8 +82,8 @@ export const useDiaperData = () => {
         current_quantity: group.diaper_stock?.[0]?.current_quantity || 0,
       }));
 
-      // Formatar dados das doações
-      const formattedDonations: DonationData[] = (donationsData || []).map(donation => ({
+      // Formatar dados das doações (apenas para admins)
+      const formattedDonations: DonationData[] = (donationsData || []).map((donation: any) => ({
         id: donation.id,
         quantity: donation.quantity,
         donor_name: donation.donor_name || 'Anônimo',
@@ -85,7 +104,7 @@ export const useDiaperData = () => {
   useEffect(() => {
     fetchData();
 
-    // Configurar real-time updates
+    // Configurar real-time updates para dados públicos
     const ageGroupsChannel = supabase
       .channel('age-groups-changes')
       .on(
@@ -112,23 +131,31 @@ export const useDiaperData = () => {
       )
       .subscribe();
 
-    const donationsChannel = supabase
-      .channel('donations-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'diaper_donations'
-        },
-        () => fetchData()
-      )
-      .subscribe();
+    // SEGURANÇA: Realtime para doações apenas para usuários autenticados
+    let donationsChannel: any = null;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        donationsChannel = supabase
+          .channel('donations-changes')
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'diaper_donations'
+            },
+            () => fetchData()
+          )
+          .subscribe();
+      }
+    });
 
     return () => {
       supabase.removeChannel(ageGroupsChannel);
       supabase.removeChannel(stockChannel);
-      supabase.removeChannel(donationsChannel);
+      if (donationsChannel) {
+        supabase.removeChannel(donationsChannel);
+      }
     };
   }, []);
 
