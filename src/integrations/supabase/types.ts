@@ -105,6 +105,7 @@ export type Database = {
           created_by: string | null
           donation_date: string | null
           donor_contact: string | null
+          donor_email: string | null
           donor_name: string | null
           id: string
           notes: string | null
@@ -116,6 +117,7 @@ export type Database = {
           created_by?: string | null
           donation_date?: string | null
           donor_contact?: string | null
+          donor_email?: string | null
           donor_name?: string | null
           id?: string
           notes?: string | null
@@ -127,6 +129,7 @@ export type Database = {
           created_by?: string | null
           donation_date?: string | null
           donor_contact?: string | null
+          donor_email?: string | null
           donor_name?: string | null
           id?: string
           notes?: string | null
