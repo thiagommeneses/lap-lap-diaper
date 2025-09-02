@@ -193,10 +193,13 @@ const RegisterDonation = () => {
                   value={donationForm.donor_contact}
                   onChange={(e) => setDonationForm({ ...donationForm, donor_contact: e.target.value })}
                 >
-                  <Input
-                    id="donor-contact"
-                    placeholder="(11) 99999-9999"
-                  />
+                  {(inputProps) => (
+                    <Input
+                      {...inputProps}
+                      id="donor-contact"
+                      placeholder="(11) 99999-9999"
+                    />
+                  )}
                 </InputMask>
               </div>
             </div>
