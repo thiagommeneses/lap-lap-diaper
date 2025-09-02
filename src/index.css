@@ -149,6 +149,14 @@
     @apply bg-gradient-to-r from-[hsl(var(--baby-pink))] to-[hsl(var(--baby-pink-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
   }
 
+  .btn-baby-mint {
+    @apply bg-gradient-to-r from-[hsl(var(--baby-mint))] to-[hsl(var(--baby-mint-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
+  }
+
+  .btn-baby-green {
+    @apply bg-gradient-to-r from-[hsl(var(--baby-mint))] to-[hsl(var(--baby-mint-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
+  }
+
   .progress-bar {
     @apply h-4 rounded-full overflow-hidden bg-muted;
   }

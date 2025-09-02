@@ -94,6 +94,53 @@ export type Database = {
           },
         ]
       }
+      diaper_purchases: {
+        Row: {
+          age_group_id: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          notes: string | null
+          purchase_date: string | null
+          quantity: number
+          store_name: string | null
+          total_cost: number | null
+          unit_price: number | null
+        }
+        Insert: {
+          age_group_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          purchase_date?: string | null
+          quantity: number
+          store_name?: string | null
+          total_cost?: number | null
+          unit_price?: number | null
+        }
+        Update: {
+          age_group_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          purchase_date?: string | null
+          quantity?: number
+          store_name?: string | null
+          total_cost?: number | null
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diaper_purchases_age_group_id_fkey"
+            columns: ["age_group_id"]
+            isOneToOne: false
+            referencedRelation: "diaper_age_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diaper_stock: {
         Row: {
           age_group_id: string | null

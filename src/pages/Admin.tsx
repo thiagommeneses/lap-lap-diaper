@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Package, Gift, LogOut, User, BarChart3 } from 'lucide-react';
+import { Settings, Package, Gift, LogOut, User, BarChart3, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { Reports } from '@/components/Reports';
 
@@ -38,6 +38,15 @@ interface DonationForm {
   notes: string;
 }
 
+interface PurchaseForm {
+  age_group_id: string;
+  quantity: number;
+  unit_price: number;
+  total_cost: number;
+  store_name: string;
+  notes: string;
+}
+
 const Admin = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -50,6 +59,15 @@ const Admin = () => {
     quantity: 0,
     donor_name: '',
     donor_contact: '',
+    notes: ''
+  });
+  
+  const [purchaseForm, setPurchaseForm] = useState<PurchaseForm>({
+    age_group_id: '',
+    quantity: 0,
+    unit_price: 0,
+    total_cost: 0,
+    store_name: '',
     notes: ''
   });
 
@@ -169,7 +187,7 @@ const Admin = () => {
 
       if (error) throw error;
 
-      toast.success('Doação registrada com sucesso!');
+      toast.success('Doação registrada com sucesso! Estoque atualizado automaticamente.');
       setDonationForm({
         age_group_id: '',
         quantity: 0,
@@ -177,9 +195,47 @@ const Admin = () => {
         donor_contact: '',
         notes: ''
       });
-      fetchData();
+      // Não precisamos chamar fetchData() pois o trigger atualiza o estoque automaticamente
     } catch (error: any) {
       toast.error('Erro ao registrar doação: ' + error.message);
+    }
+  };
+
+  const handlePurchase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!purchaseForm.age_group_id || purchaseForm.quantity <= 0) {
+      toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('diaper_purchases')
+        .insert({
+          age_group_id: purchaseForm.age_group_id,
+          quantity: purchaseForm.quantity,
+          unit_price: purchaseForm.unit_price,
+          total_cost: purchaseForm.total_cost,
+          store_name: purchaseForm.store_name,
+          notes: purchaseForm.notes,
+          created_by: user?.id
+        });
+
+      if (error) throw error;
+
+      toast.success('Compra registrada com sucesso! Estoque atualizado automaticamente.');
+      setPurchaseForm({
+        age_group_id: '',
+        quantity: 0,
+        unit_price: 0,
+        total_cost: 0,
+        store_name: '',
+        notes: ''
+      });
+      // Não precisamos chamar fetchData() pois o trigger atualiza o estoque automaticamente
+    } catch (error: any) {
+      toast.error('Erro ao registrar compra: ' + error.message);
     }
   };
 
@@ -293,6 +349,10 @@ const Admin = () => {
             <TabsTrigger value="donations" className="flex items-center gap-2">
               <Gift className="w-4 h-4" />
               Registrar Doação
+            </TabsTrigger>
+            <TabsTrigger value="purchases" className="flex items-center gap-2">
+              <ShoppingCart className="w-4 h-4" />
+              Registrar Compra
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -410,6 +470,109 @@ const Admin = () => {
                 <Button type="submit" className="btn-baby-mint">
                   <Gift className="w-4 h-4 mr-2" />
                   Registrar Doação
+                </Button>
+              </form>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="purchases" className="space-y-6">
+            <Card className="card-baby p-6">
+              <h2 className="text-xl font-semibold font-heading text-foreground mb-4">
+                Registrar Nova Compra
+              </h2>
+              <form onSubmit={handlePurchase} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="purchase-age-group">Faixa Etária *</Label>
+                    <select
+                      id="purchase-age-group"
+                      className="w-full p-2 border border-border rounded-md bg-background text-foreground"
+                      value={purchaseForm.age_group_id}
+                      onChange={(e) => setPurchaseForm({ ...purchaseForm, age_group_id: e.target.value })}
+                      required
+                    >
+                      <option value="">Selecione...</option>
+                      {ageGroups.map((group) => (
+                        <option key={group.id} value={group.id}>
+                          {group.name} ({group.age_range})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="purchase-quantity">Quantidade *</Label>
+                    <Input
+                      id="purchase-quantity"
+                      type="number"
+                      value={purchaseForm.quantity}
+                      onChange={(e) => {
+                        const qty = parseInt(e.target.value) || 0;
+                        setPurchaseForm({ 
+                          ...purchaseForm, 
+                          quantity: qty,
+                          total_cost: qty * purchaseForm.unit_price
+                        });
+                      }}
+                      required
+                      min="1"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="unit-price">Preço Unitário (R$)</Label>
+                    <Input
+                      id="unit-price"
+                      type="number"
+                      step="0.01"
+                      value={purchaseForm.unit_price}
+                      onChange={(e) => {
+                        const price = parseFloat(e.target.value) || 0;
+                        setPurchaseForm({ 
+                          ...purchaseForm, 
+                          unit_price: price,
+                          total_cost: purchaseForm.quantity * price
+                        });
+                      }}
+                      min="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="total-cost">Total (R$)</Label>
+                    <Input
+                      id="total-cost"
+                      type="number"
+                      step="0.01"
+                      value={purchaseForm.total_cost}
+                      onChange={(e) => setPurchaseForm({ ...purchaseForm, total_cost: parseFloat(e.target.value) || 0 })}
+                      min="0"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="store-name">Loja/Fornecedor</Label>
+                    <Input
+                      id="store-name"
+                      value={purchaseForm.store_name}
+                      onChange={(e) => setPurchaseForm({ ...purchaseForm, store_name: e.target.value })}
+                      placeholder="Ex: Farmácia ABC"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="purchase-notes">Observações</Label>
+                  <Textarea
+                    id="purchase-notes"
+                    placeholder="Ex: marca, desconto aplicado, etc."
+                    value={purchaseForm.notes}
+                    onChange={(e) => setPurchaseForm({ ...purchaseForm, notes: e.target.value })}
+                  />
+                </div>
+
+                <Button type="submit" className="btn-baby-blue">
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Registrar Compra
                 </Button>
               </form>
             </Card>
