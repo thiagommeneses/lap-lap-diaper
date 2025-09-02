@@ -21,7 +21,7 @@ export const DashboardHeader = () => {
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-4">
-            Controle de Fraldas
+            Lap Lap Diaper
           </h1>
           
           <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
