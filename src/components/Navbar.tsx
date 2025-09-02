@@ -12,14 +12,17 @@ import {
   LogOut,
   User,
   Gift,
-  ShoppingCart
+  ShoppingCart,
+  Crown
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 
 export const Navbar = () => {
   const { user, session } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -52,13 +55,25 @@ export const Navbar = () => {
     { name: "Registrar Compra", path: "/register-purchase", icon: ShoppingCart }
   ];
 
-  const NavLink = ({ item, mobile = false }: { item: typeof navigationItems[0], mobile?: boolean }) => (
+  // Add super admin item if user is super admin
+  const allNavigationItems = isSuperAdmin 
+    ? [
+        ...navigationItems,
+        { name: "Super Admin", path: "/supreme-control-panel", icon: Crown }
+      ]
+    : navigationItems;
+
+  const NavLink = ({ item, mobile = false }: { item: typeof allNavigationItems[0], mobile?: boolean }) => (
     <Link
       to={item.path}
       className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
         isActive(item.path)
-          ? "bg-baby-blue/20 text-baby-blue"
-          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+          ? item.name === "Super Admin" 
+            ? "bg-yellow-100 text-yellow-800"
+            : "bg-baby-blue/20 text-baby-blue"
+          : item.name === "Super Admin"
+            ? "text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50"
+            : "text-muted-foreground hover:text-foreground hover:bg-accent"
       } ${mobile ? "w-full" : ""}`}
       onClick={() => mobile && setIsOpen(false)}
     >
@@ -87,7 +102,7 @@ export const Navbar = () => {
             {user && session ? (
               <>
                 <div className="flex items-center gap-1">
-                  {navigationItems.map((item) => (
+                  {allNavigationItems.map((item) => (
                     <NavLink key={item.path} item={item} />
                   ))}
                 </div>
@@ -143,7 +158,7 @@ export const Navbar = () => {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      {navigationItems.map((item) => (
+                      {allNavigationItems.map((item) => (
                         <NavLink key={item.path} item={item} mobile />
                       ))}
                     </div>

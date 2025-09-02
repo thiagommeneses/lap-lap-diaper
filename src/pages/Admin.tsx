@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +9,9 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Package, Gift, User, BarChart3, ShoppingCart, Type } from 'lucide-react';
+import { Settings, Package, Gift, User, BarChart3, ShoppingCart, Type, Crown, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Reports } from '@/components/Reports';
 
@@ -49,6 +51,7 @@ interface PurchaseForm {
 
 const Admin = () => {
   const { user } = useAuth();
+  const { isSuperAdmin } = useSuperAdmin();
   const navigate = useNavigate();
   const [ageGroups, setAgeGroups] = useState<AgeGroup[]>([]);
   const [stocks, setStocks] = useState<Stock[]>([]);
@@ -310,6 +313,27 @@ const Admin = () => {
   return (
     <div className="bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Super Admin Alert */}
+        {isSuperAdmin && (
+          <Alert className="mb-6 border-yellow-200 bg-yellow-50">
+            <Crown className="h-4 w-4 text-yellow-600" />
+            <AlertDescription className="flex items-center justify-between">
+              <span className="text-yellow-800">
+                Você tem acesso ao painel de Super Administrador com controle total do sistema.
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/supreme-control-panel')}
+                className="ml-4 border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+              >
+                Acessar Super Admin
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>

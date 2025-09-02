@@ -6,9 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/Navbar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SuperAdminRoute } from "@/components/SuperAdminRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import SuperAdmin from "./pages/SuperAdmin";
 import Usage from "./pages/Usage";
 import BabySettings from "./pages/BabySettings";
 import PageSettings from "./pages/PageSettings";
@@ -33,6 +35,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                <Route path="/supreme-control-panel" element={<SuperAdminRoute><SuperAdmin /></SuperAdminRoute>} />
                 <Route path="/usage" element={<ProtectedRoute><Usage /></ProtectedRoute>} />
                 <Route path="/baby-settings" element={<ProtectedRoute><BabySettings /></ProtectedRoute>} />
                 <Route path="/page-settings" element={<ProtectedRoute><PageSettings /></ProtectedRoute>} />

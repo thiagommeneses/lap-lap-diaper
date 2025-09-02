@@ -294,6 +294,7 @@ export type Database = {
           email: string | null
           id: string
           is_admin: boolean | null
+          super_admin: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -302,6 +303,7 @@ export type Database = {
           email?: string | null
           id: string
           is_admin?: boolean | null
+          super_admin?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -310,6 +312,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_admin?: boolean | null
+          super_admin?: boolean | null
           updated_at?: string | null
         }
         Relationships: []
@@ -350,9 +353,30 @@ export type Database = {
           total_quantity: number
         }[]
       }
+      get_user_management_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          age_groups_count: number
+          baby_count: number
+          created_at: string
+          display_name: string
+          email: string
+          id: string
+          is_admin: boolean
+          super_admin: boolean
+        }[]
+      }
       is_current_user_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      update_user_admin_status: {
+        Args: { new_admin_status: boolean; target_user_id: string }
+        Returns: undefined
       }
     }
     Enums: {
