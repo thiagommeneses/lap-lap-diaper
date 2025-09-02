@@ -40,12 +40,17 @@ const RegisterDonation = () => {
     notes: ''
   });
 
+  console.log('RegisterDonation component loaded, user:', user);
+
   useEffect(() => {
+    console.log('RegisterDonation useEffect triggered, user:', user);
     if (!user) {
+      console.log('No user found, redirecting to /auth');
       navigate('/auth');
       return;
     }
     
+    console.log('User found, calling fetchAgeGroups');
     fetchAgeGroups();
   }, [user, navigate]);
 
