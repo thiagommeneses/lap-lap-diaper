@@ -368,45 +368,61 @@ const Admin = () => {
                           {group.age_range}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Label className="text-sm">Quantidade:</Label>
-                        <Input
-                          type="number"
-                          value={editingStocks[stock?.id || ''] !== undefined 
-                            ? editingStocks[stock?.id || ''] 
-                            : (stock?.current_quantity || 0)}
-                          onChange={(e) => {
-                            if (stock) {
-                              setEditingStocks(prev => ({
-                                ...prev,
-                                [stock.id]: parseInt(e.target.value) || 0
-                              }));
-                            }
-                          }}
-                          onBlur={(e) => {
-                            if (stock && editingStocks[stock.id] !== undefined) {
-                              handleUpdateStock(stock.id, editingStocks[stock.id]);
-                              setEditingStocks(prev => {
-                                const newState = { ...prev };
-                                delete newState[stock.id];
-                                return newState;
-                              });
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && stock && editingStocks[stock.id] !== undefined) {
-                              handleUpdateStock(stock.id, editingStocks[stock.id]);
-                              setEditingStocks(prev => {
-                                const newState = { ...prev };
-                                delete newState[stock.id];
-                                return newState;
-                              });
-                              e.currentTarget.blur();
-                            }
-                          }}
-                          className="flex-1"
-                          min="0"
-                        />
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Label className="text-sm">Quantidade:</Label>
+                          <Input
+                            type="number"
+                            value={editingStocks[stock?.id || ''] !== undefined 
+                              ? editingStocks[stock?.id || ''] 
+                              : (stock?.current_quantity || 0)}
+                            onChange={(e) => {
+                              if (stock) {
+                                setEditingStocks(prev => ({
+                                  ...prev,
+                                  [stock.id]: parseInt(e.target.value) || 0
+                                }));
+                              }
+                            }}
+                            className="flex-1"
+                            min="0"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (stock && editingStocks[stock.id] !== undefined) {
+                                handleUpdateStock(stock.id, editingStocks[stock.id]);
+                                setEditingStocks(prev => {
+                                  const newState = { ...prev };
+                                  delete newState[stock.id];
+                                  return newState;
+                                });
+                              }
+                            }}
+                            disabled={!stock || editingStocks[stock?.id || ''] === undefined}
+                            className="btn-baby-mint"
+                          >
+                            Salvar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              if (stock) {
+                                setEditingStocks(prev => {
+                                  const newState = { ...prev };
+                                  delete newState[stock.id];
+                                  return newState;
+                                });
+                              }
+                            }}
+                            disabled={!stock || editingStocks[stock?.id || ''] === undefined}
+                          >
+                            Cancelar
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   );
