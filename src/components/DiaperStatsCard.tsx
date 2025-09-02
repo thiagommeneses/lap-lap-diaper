@@ -8,6 +8,7 @@ interface DiaperStatsCardProps {
   total: number;
   ageRange: string;
   color: "blue" | "pink" | "purple" | "mint" | "yellow";
+  monthlyAverage?: number;
 }
 
 const colorClasses = {
@@ -24,7 +25,8 @@ export const DiaperStatsCard = ({
   count, 
   total, 
   ageRange, 
-  color 
+  color,
+  monthlyAverage 
 }: DiaperStatsCardProps) => {
   const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
   
@@ -47,6 +49,15 @@ export const DiaperStatsCard = ({
       <div className="space-y-2">
         <h3 className="font-medium text-foreground">{title}</h3>
         <p className="text-xs text-muted-foreground">{ageRange}</p>
+        
+        {monthlyAverage && (
+          <div className="bg-background/50 rounded-lg p-2 mt-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">Média mensal:</span>
+              <span className="text-sm font-medium text-foreground">{monthlyAverage}/mês</span>
+            </div>
+          </div>
+        )}
         
         <div className="progress-bar">
           <div 

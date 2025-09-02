@@ -30,7 +30,8 @@ const Index = () => {
     getTotalTarget, 
     getProgressPercentage,
     getShoppingList,
-    getLowStockAlerts
+    getLowStockAlerts,
+    getMonthlyAverage
   } = useDiaperData();
 
   if (loading) {
@@ -49,6 +50,7 @@ const Index = () => {
   const progressPercentage = getProgressPercentage();
   const shoppingList = getShoppingList();
   const lowStockAlerts = getLowStockAlerts();
+  const monthlyAverages = getMonthlyAverage();
 
   return (
     <div className="min-h-screen bg-background">
@@ -105,6 +107,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {ageGroups.map((group) => {
               const IconComponent = iconMap[group.icon_name as keyof typeof iconMap] || Baby;
+              const monthlyData = monthlyAverages.find(avg => avg.id === group.id);
               return (
                 <DiaperStatsCard 
                   key={group.id}
@@ -114,6 +117,7 @@ const Index = () => {
                   total={group.estimated_quantity}
                   ageRange={group.age_range}
                   color={group.color_theme as any}
+                  monthlyAverage={monthlyData?.monthlyAverage}
                 />
               );
             })}

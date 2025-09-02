@@ -184,6 +184,15 @@ export const useDiaperData = () => {
     });
   };
 
+  const getMonthlyAverage = () => {
+    return ageGroups.map(group => ({
+      id: group.id,
+      name: group.name,
+      monthlyAverage: Math.round(group.estimated_quantity / 12), // Dividir meta anual por 12 meses
+      ageRange: group.age_range
+    }));
+  };
+
   return {
     ageGroups,
     donations,
@@ -193,6 +202,7 @@ export const useDiaperData = () => {
     getProgressPercentage,
     getShoppingList,
     getLowStockAlerts,
+    getMonthlyAverage,
     refetch: fetchData,
   };
 };
