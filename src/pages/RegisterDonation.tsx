@@ -27,7 +27,7 @@ interface DonationForm {
 }
 
 const RegisterDonation = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [ageGroups, setAgeGroups] = useState<AgeGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,19 +40,17 @@ const RegisterDonation = () => {
     notes: ''
   });
 
-  console.log('RegisterDonation component loaded, user:', user);
-
   useEffect(() => {
-    console.log('RegisterDonation useEffect triggered, user:', user);
+    // Wait for auth to finish loading
+    if (authLoading) return;
+    
     if (!user) {
-      console.log('No user found, redirecting to /auth');
       navigate('/auth');
       return;
     }
     
-    console.log('User found, calling fetchAgeGroups');
     fetchAgeGroups();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchAgeGroups = async () => {
     try {
@@ -107,7 +105,7 @@ const RegisterDonation = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -126,11 +124,11 @@ const RegisterDonation = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/admin')}
+            onClick={() => navigate('/')}
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Voltar ao Admin
+            Voltar
           </Button>
           <div>
             <h1 className="text-3xl font-bold font-heading text-foreground">Registrar Doação</h1>
