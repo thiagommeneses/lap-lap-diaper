@@ -6,12 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { supabase } from '@/integrations/supabase/client';
 import { Gift, ArrowLeft, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import InputMask from 'react-input-mask';
 import { useAdmin } from '@/hooks/useAdmin';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface AgeGroup {
   id: string;
@@ -44,42 +44,32 @@ const RegisterDonation = () => {
   });
 
   useEffect(() => {
-    console.log('RegisterDonation - user:', user);
-    console.log('RegisterDonation - isAdmin:', isAdmin);
-    console.log('RegisterDonation - adminLoading:', adminLoading);
-    
     if (!user) {
-      console.log('No user, redirecting to auth');
       navigate('/auth');
       return;
     }
     
     if (!adminLoading && !isAdmin) {
-      console.log('User is not admin, stopping loading');
       // Usuário não é admin, não pode registrar doações
       setLoading(false);
       return;
     }
     
     if (isAdmin) {
-      console.log('User is admin, fetching age groups');
       fetchAgeGroups();
     }
   }, [user, navigate, isAdmin, adminLoading]);
 
   const fetchAgeGroups = async () => {
-    console.log('Fetching age groups...');
     try {
       const { data, error } = await supabase
         .from('diaper_age_groups')
         .select('id, name, age_range')
         .order('created_at');
 
-      console.log('Age groups response:', { data, error });
       if (error) throw error;
       setAgeGroups(data || []);
     } catch (error: any) {
-      console.error('Error fetching age groups:', error);
       toast.error('Erro ao carregar faixas etárias: ' + error.message);
     } finally {
       setLoading(false);
@@ -122,8 +112,6 @@ const RegisterDonation = () => {
       toast.error('Erro ao registrar doação: ' + error.message);
     }
   };
-
-  console.log('RegisterDonation render - loading:', loading, 'adminLoading:', adminLoading, 'user:', !!user, 'isAdmin:', isAdmin);
 
   if (loading || adminLoading) {
     return (

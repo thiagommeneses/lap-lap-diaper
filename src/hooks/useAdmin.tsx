@@ -19,11 +19,15 @@ export const useAdmin = () => {
     }
 
     try {
-      const { data, error } = await supabase.rpc('is_current_user_admin');
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
       
       if (error) throw error;
       
-      setIsAdmin(data || false);
+      setIsAdmin(data?.is_admin || false);
     } catch (error) {
       console.error('Error checking admin status:', error);
       setIsAdmin(false);
