@@ -42,7 +42,7 @@ export const StockUsage = () => {
           quantity: parseInt(formData.quantity),
           notes: formData.notes || null,
           usage_date: formData.usage_date,
-          created_by: (await supabase.auth.getUser()).data.user?.id
+          user_id: (await supabase.auth.getUser()).data.user?.id
         });
 
       if (error) throw error;
