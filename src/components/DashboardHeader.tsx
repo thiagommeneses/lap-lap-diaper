@@ -1,4 +1,4 @@
-import { Baby, Settings } from "lucide-react";
+import { Baby, Settings, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/baby-hero.jpg";
@@ -34,6 +34,20 @@ export const DashboardHeader = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="btn-baby-pink" onClick={() => navigate('/admin')}>
               Administração
+            </Button>
+            <Button 
+              className="btn-baby-mint" 
+              onClick={() => navigate('/usage')}
+            >
+              <Package className="w-4 h-4 mr-2" />
+              Consumir Estoque
+            </Button>
+            <Button 
+              className="btn-baby-blue" 
+              onClick={() => navigate('/baby-settings')}
+            >
+              <Baby className="w-4 h-4 mr-2" />
+              Config. Bebê
             </Button>
             <Button 
               variant="outline" 

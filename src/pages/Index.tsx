@@ -13,6 +13,7 @@ import { DiaperStatsCard } from "@/components/DiaperStatsCard";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { BabyInfoDisplay } from "@/components/BabyInfoDisplay";
 import { useDiaperData } from "@/hooks/useDiaperData";
 
 const iconMap = {
@@ -56,6 +57,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <DashboardHeader />
+        <BabyInfoDisplay />
         
         {/* Resumo Geral */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

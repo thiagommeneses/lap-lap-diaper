@@ -15,6 +15,8 @@
     --baby-purple-dark: 280 50% 75%;
     --baby-yellow: 50 60% 85%;
     --baby-yellow-dark: 50 50% 75%;
+    --baby-orange: 25 70% 75%;
+    --baby-orange-dark: 25 60% 65%;
     --baby-mint: 160 60% 85%;
     --baby-mint-dark: 160 50% 75%;
     --baby-cream: 45 40% 95%;
@@ -155,6 +157,10 @@
 
   .btn-baby-green {
     @apply bg-gradient-to-r from-[hsl(var(--baby-mint))] to-[hsl(var(--baby-mint-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
+  }
+
+  .btn-baby-orange {
+    @apply bg-gradient-to-r from-[hsl(var(--baby-orange))] to-[hsl(var(--baby-orange-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
   }
 
   .progress-bar {

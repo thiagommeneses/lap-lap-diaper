@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      baby_info: {
+        Row: {
+          birth_date: string | null
+          birth_place: string | null
+          created_at: string
+          gender: string | null
+          id: string
+          is_born: boolean | null
+          name: string
+          parent1_name: string | null
+          parent2_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          birth_place?: string | null
+          created_at?: string
+          gender?: string | null
+          id?: string
+          is_born?: boolean | null
+          name: string
+          parent1_name?: string | null
+          parent2_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          birth_place?: string | null
+          created_at?: string
+          gender?: string | null
+          id?: string
+          is_born?: boolean | null
+          name?: string
+          parent1_name?: string | null
+          parent2_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       diaper_age_groups: {
         Row: {
           age_range: string
@@ -172,6 +211,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      diaper_usage: {
+        Row: {
+          age_group_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          quantity: number
+          usage_date: string | null
+        }
+        Insert: {
+          age_group_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          quantity: number
+          usage_date?: string | null
+        }
+        Update: {
+          age_group_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          quantity?: number
+          usage_date?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
