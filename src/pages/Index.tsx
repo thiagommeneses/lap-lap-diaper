@@ -16,6 +16,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { BabyInfoDisplay } from "@/components/BabyInfoDisplay";
 import { useDiaperData } from "@/hooks/useDiaperData";
+import { useDonorData } from "@/hooks/useDonorData";
+import { useAuth } from "@/contexts/AuthContext";
 
 const iconMap = {
   Baby,
@@ -25,6 +27,7 @@ const iconMap = {
 };
 
 const Index = () => {
+  const { user } = useAuth();
   const { 
     ageGroups, 
     loading, 
@@ -37,13 +40,110 @@ const Index = () => {
     getTotalUsage,
     getUsageByAgeGroup
   } = useDiaperData();
+  
+  const { 
+    recentDonors, 
+    topDonors, 
+    loading: donorsLoading 
+  } = useDonorData();
 
-  if (loading) {
+  if (loading || donorsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Para usuários não autenticados, mostrar página pública com doadores
+  if (!user) {
+    return (
+      <div className="bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <DashboardHeader />
+          
+          {/* Seção para visitantes - Listas de doadores */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Últimos Doadores */}
+            <Card className="card-baby p-6">
+              <h2 className="text-xl font-bold font-heading text-foreground mb-4 text-center flex items-center justify-center">
+                <Heart className="w-6 h-6 mr-2 text-baby-pink" />
+                Últimos Doadores ❤️
+              </h2>
+              <div className="space-y-4">
+                {recentDonors.length === 0 ? (
+                  <p className="text-muted-foreground text-center">Nenhuma doação recente</p>
+                ) : (
+                  recentDonors.map((donor, index) => (
+                    <div key={index} className="bg-gradient-baby-pink/20 p-4 rounded-lg border border-baby-pink/30">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-foreground">{donor.donor_name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {donor.age_group_name} • {new Date(donor.donation_date).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                        <Badge variant="secondary" className="bg-baby-pink text-foreground">
+                          {donor.quantity} fraldas
+                        </Badge>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+
+            {/* Top Doadores */}
+            <Card className="card-baby p-6">
+              <h2 className="text-xl font-bold font-heading text-foreground mb-4 text-center flex items-center justify-center">
+                <Star className="w-6 h-6 mr-2 text-baby-yellow" />
+                Top Doadores 🌟
+              </h2>
+              <div className="space-y-4">
+                {topDonors.length === 0 ? (
+                  <p className="text-muted-foreground text-center">Nenhum doador ainda</p>
+                ) : (
+                  topDonors.map((donor, index) => (
+                    <div key={index} className="bg-gradient-baby-yellow/20 p-4 rounded-lg border border-baby-yellow/30">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 bg-baby-yellow rounded-full flex items-center justify-center text-foreground font-bold mr-3">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-foreground">{donor.donor_name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {donor.donation_count} doações
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="secondary" className="bg-baby-yellow text-foreground">
+                          {donor.total_donated} fraldas
+                        </Badge>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* Call to Action para visitantes */}
+          <Card className="card-baby p-8 text-center">
+            <Baby className="w-16 h-16 mx-auto mb-4 text-baby-blue" />
+            <h2 className="text-2xl font-bold font-heading text-foreground mb-4">
+              Junte-se à nossa comunidade! 👶
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              Crie sua conta para gerenciar o estoque de fraldas do seu bebê e acompanhar seu crescimento.
+            </p>
+            <Badge variant="secondary" className="bg-baby-mint text-foreground px-6 py-2 text-lg">
+              Sistema privado e seguro para cada família
+            </Badge>
+          </Card>
         </div>
       </div>
     );

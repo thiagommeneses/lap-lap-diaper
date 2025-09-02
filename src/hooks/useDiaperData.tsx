@@ -37,7 +37,7 @@ export const useDiaperData = () => {
 
   const fetchData = async () => {
     try {
-      // Buscar grupos de idade com estoque
+      // Buscar grupos de idade com estoque (isolado por usuário autenticado)
       const { data: ageGroupsData, error: ageGroupsError } = await supabase
         .from('diaper_age_groups')
         .select(`
@@ -48,8 +48,7 @@ export const useDiaperData = () => {
 
       if (ageGroupsError) throw ageGroupsError;
 
-      // SEGURANÇA: Não tentar buscar detalhes de doações para usuários não autenticados
-      // Apenas administradores podem ver informações pessoais dos doadores
+      // Buscar dados de uso e doações (isolado por usuário)
       let donationsData = [];
       let usageData = [];
       try {
@@ -75,7 +74,7 @@ export const useDiaperData = () => {
             donationsData = adminDonations || [];
           }
 
-          // Buscar dados de uso (disponível para usuários autenticados)
+          // Buscar dados de uso (agora isolado por usuário)
           const { data: userUsage } = await supabase
             .from('diaper_usage')
             .select(`
