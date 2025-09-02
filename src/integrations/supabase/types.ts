@@ -92,6 +92,13 @@ export type Database = {
             referencedRelation: "diaper_age_groups"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "diaper_donations_age_group_id_fkey"
+            columns: ["age_group_id"]
+            isOneToOne: false
+            referencedRelation: "donation_summary"
+            referencedColumns: ["age_group_id"]
+          },
         ]
       }
       diaper_stock: {
@@ -124,6 +131,13 @@ export type Database = {
             referencedRelation: "diaper_age_groups"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "diaper_stock_age_group_id_fkey"
+            columns: ["age_group_id"]
+            isOneToOne: false
+            referencedRelation: "donation_summary"
+            referencedColumns: ["age_group_id"]
+          },
         ]
       }
       profiles: {
@@ -155,7 +169,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      donation_summary: {
+        Row: {
+          age_group_id: string | null
+          age_group_name: string | null
+          last_donation_date: string | null
+          total_donations: number | null
+          total_quantity: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
