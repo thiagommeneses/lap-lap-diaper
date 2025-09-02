@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import { Gift, ArrowLeft } from 'lucide-react';
+import { Gift, ArrowLeft, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import InputMask from 'react-input-mask';
+import { useAdmin } from '@/hooks/useAdmin';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface AgeGroup {
   id: string;
@@ -28,6 +30,7 @@ interface DonationForm {
 
 const RegisterDonation = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
   const [ageGroups, setAgeGroups] = useState<AgeGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,8 +49,16 @@ const RegisterDonation = () => {
       return;
     }
     
-    fetchAgeGroups();
-  }, [user, navigate]);
+    if (!adminLoading && !isAdmin) {
+      // Usuário não é admin, não pode registrar doações
+      setLoading(false);
+      return;
+    }
+    
+    if (isAdmin) {
+      fetchAgeGroups();
+    }
+  }, [user, navigate, isAdmin, adminLoading]);
 
   const fetchAgeGroups = async () => {
     try {
@@ -102,12 +113,41 @@ const RegisterDonation = () => {
     }
   };
 
-  if (loading) {
+  if (loading || adminLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Se o usuário não é admin, mostrar mensagem de acesso negado
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background pt-20">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center gap-4 mb-8">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin')}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar ao Admin
+            </Button>
+          </div>
+          
+          <Alert className="max-w-2xl">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Acesso restrito: Apenas administradores podem registrar doações. 
+              Entre em contato com o administrador do sistema para solicitar permissões.
+            </AlertDescription>
+          </Alert>
         </div>
       </div>
     );
