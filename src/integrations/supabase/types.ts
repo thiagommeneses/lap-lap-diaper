@@ -67,7 +67,7 @@ export type Database = {
           name: string
           price_per_unit: number | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           age_range: string
@@ -79,7 +79,7 @@ export type Database = {
           name: string
           price_per_unit?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           age_range?: string
@@ -91,7 +91,7 @@ export type Database = {
           name?: string
           price_per_unit?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -193,7 +193,7 @@ export type Database = {
           id: string
           last_updated_at: string | null
           notes: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           age_group_id?: string | null
@@ -201,7 +201,7 @@ export type Database = {
           id?: string
           last_updated_at?: string | null
           notes?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           age_group_id?: string | null
@@ -209,7 +209,7 @@ export type Database = {
           id?: string
           last_updated_at?: string | null
           notes?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -230,7 +230,7 @@ export type Database = {
           notes: string | null
           quantity: number
           usage_date: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           age_group_id?: string | null
@@ -240,7 +240,7 @@ export type Database = {
           notes?: string | null
           quantity: number
           usage_date?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           age_group_id?: string | null
@@ -250,7 +250,7 @@ export type Database = {
           notes?: string | null
           quantity?: number
           usage_date?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -261,7 +261,7 @@ export type Database = {
           subtitle: string | null
           title: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
           welcome_message: string | null
         }
         Insert: {
@@ -270,7 +270,7 @@ export type Database = {
           subtitle?: string | null
           title?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
           welcome_message?: string | null
         }
         Update: {
@@ -279,7 +279,7 @@ export type Database = {
           subtitle?: string | null
           title?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
           welcome_message?: string | null
         }
         Relationships: []
