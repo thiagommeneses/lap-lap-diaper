@@ -27,7 +27,7 @@ interface DonationForm {
 }
 
 const RegisterDonation = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [ageGroups, setAgeGroups] = useState<AgeGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,16 +41,13 @@ const RegisterDonation = () => {
   });
 
   useEffect(() => {
-    // Wait for auth to finish loading
-    if (authLoading) return;
-    
     if (!user) {
       navigate('/auth');
       return;
     }
     
     fetchAgeGroups();
-  }, [user, authLoading, navigate]);
+  }, [user, navigate]);
 
   const fetchAgeGroups = async () => {
     try {
@@ -105,7 +102,7 @@ const RegisterDonation = () => {
     }
   };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -124,11 +121,11 @@ const RegisterDonation = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/admin')}
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Voltar
+            Voltar ao Admin
           </Button>
           <div>
             <h1 className="text-3xl font-bold font-heading text-foreground">Registrar Doação</h1>
@@ -140,9 +137,9 @@ const RegisterDonation = () => {
           <form onSubmit={handleDonation} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="age-group">Faixa Etária *</Label>
+                <Label htmlFor="donation-age-group">Faixa Etária *</Label>
                 <select
-                  id="age-group"
+                  id="donation-age-group"
                   className="w-full p-2 border border-border rounded-md bg-background text-foreground"
                   value={donationForm.age_group_id}
                   onChange={(e) => setDonationForm({ ...donationForm, age_group_id: e.target.value })}
@@ -157,9 +154,9 @@ const RegisterDonation = () => {
                 </select>
               </div>
               <div>
-                <Label htmlFor="quantity">Quantidade *</Label>
+                <Label htmlFor="donation-quantity">Quantidade *</Label>
                 <Input
-                  id="quantity"
+                  id="donation-quantity"
                   type="number"
                   value={donationForm.quantity}
                   onChange={(e) => setDonationForm({ ...donationForm, quantity: parseInt(e.target.value) || 0 })}
@@ -176,6 +173,7 @@ const RegisterDonation = () => {
                   id="donor-name"
                   value={donationForm.donor_name}
                   onChange={(e) => setDonationForm({ ...donationForm, donor_name: e.target.value })}
+                  placeholder="Nome completo"
                 />
               </div>
               <div>
@@ -185,6 +183,7 @@ const RegisterDonation = () => {
                   type="email"
                   value={donationForm.donor_email}
                   onChange={(e) => setDonationForm({ ...donationForm, donor_email: e.target.value })}
+                  placeholder="exemplo@email.com"
                 />
               </div>
               <div>
@@ -203,9 +202,9 @@ const RegisterDonation = () => {
             </div>
 
             <div>
-              <Label htmlFor="notes">Observações</Label>
+              <Label htmlFor="donation-notes">Observações</Label>
               <Textarea
-                id="notes"
+                id="donation-notes"
                 placeholder="Ex: marca, condições especiais, etc."
                 value={donationForm.notes}
                 onChange={(e) => setDonationForm({ ...donationForm, notes: e.target.value })}
