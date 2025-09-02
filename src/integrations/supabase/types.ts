@@ -14,7 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      diaper_age_groups: {
+        Row: {
+          age_range: string
+          color_theme: string | null
+          created_at: string | null
+          estimated_quantity: number
+          icon_name: string | null
+          id: string
+          name: string
+          price_per_unit: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          age_range: string
+          color_theme?: string | null
+          created_at?: string | null
+          estimated_quantity?: number
+          icon_name?: string | null
+          id?: string
+          name: string
+          price_per_unit?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          age_range?: string
+          color_theme?: string | null
+          created_at?: string | null
+          estimated_quantity?: number
+          icon_name?: string | null
+          id?: string
+          name?: string
+          price_per_unit?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      diaper_donations: {
+        Row: {
+          age_group_id: string | null
+          created_at: string | null
+          created_by: string | null
+          donation_date: string | null
+          donor_contact: string | null
+          donor_name: string | null
+          id: string
+          notes: string | null
+          quantity: number
+        }
+        Insert: {
+          age_group_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          donation_date?: string | null
+          donor_contact?: string | null
+          donor_name?: string | null
+          id?: string
+          notes?: string | null
+          quantity: number
+        }
+        Update: {
+          age_group_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          donation_date?: string | null
+          donor_contact?: string | null
+          donor_name?: string | null
+          id?: string
+          notes?: string | null
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diaper_donations_age_group_id_fkey"
+            columns: ["age_group_id"]
+            isOneToOne: false
+            referencedRelation: "diaper_age_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diaper_stock: {
+        Row: {
+          age_group_id: string | null
+          current_quantity: number
+          id: string
+          last_updated_at: string | null
+          notes: string | null
+        }
+        Insert: {
+          age_group_id?: string | null
+          current_quantity?: number
+          id?: string
+          last_updated_at?: string | null
+          notes?: string | null
+        }
+        Update: {
+          age_group_id?: string | null
+          current_quantity?: number
+          id?: string
+          last_updated_at?: string | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diaper_stock_age_group_id_fkey"
+            columns: ["age_group_id"]
+            isOneToOne: false
+            referencedRelation: "diaper_age_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          email: string | null
+          id: string
+          is_admin: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id: string
+          is_admin?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          is_admin?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
