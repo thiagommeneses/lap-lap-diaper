@@ -2,41 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Baby Diaper Control System - Design System with Pastel Colors */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Baby Theme Pastel Colors */
+    --baby-blue: 220 60% 85%;
+    --baby-blue-dark: 220 50% 75%;
+    --baby-pink: 340 60% 85%;
+    --baby-pink-dark: 340 50% 75%;
+    --baby-purple: 280 60% 85%;
+    --baby-purple-dark: 280 50% 75%;
+    --baby-yellow: 50 60% 85%;
+    --baby-yellow-dark: 50 50% 75%;
+    --baby-mint: 160 60% 85%;
+    --baby-mint-dark: 160 50% 75%;
+    --baby-cream: 45 40% 95%;
+    --baby-white: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Background & Layout */
+    --background: var(--baby-cream);
+    --foreground: 220 15% 25%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --card: var(--baby-white);
+    --card-foreground: 220 15% 25%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --popover: var(--baby-white);
+    --popover-foreground: 220 15% 25%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Primary Theme - Baby Blue */
+    --primary: var(--baby-blue-dark);
+    --primary-foreground: 220 15% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Secondary Theme - Baby Pink */
+    --secondary: var(--baby-pink);
+    --secondary-foreground: 220 15% 25%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 220 20% 90%;
+    --muted-foreground: 220 15% 45%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: var(--baby-mint);
+    --accent-foreground: 220 15% 25%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive: 0 65% 70%;
+    --destructive-foreground: var(--baby-white);
 
-    --radius: 0.5rem;
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: var(--baby-blue-dark);
+
+    --radius: 1rem;
+
+    /* Gradients */
+    --gradient-baby-blue: linear-gradient(135deg, hsl(var(--baby-blue)), hsl(var(--baby-blue-dark)));
+    --gradient-baby-pink: linear-gradient(135deg, hsl(var(--baby-pink)), hsl(var(--baby-pink-dark)));
+    --gradient-baby-purple: linear-gradient(135deg, hsl(var(--baby-purple)), hsl(var(--baby-purple-dark)));
+    --gradient-baby-mint: linear-gradient(135deg, hsl(var(--baby-mint)), hsl(var(--baby-mint-dark)));
+    --gradient-soft: linear-gradient(135deg, hsl(var(--baby-cream)), hsl(var(--baby-white)));
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -8px hsl(var(--baby-blue-dark) / 0.2);
+    --shadow-card: 0 8px 32px -12px hsl(var(--baby-blue-dark) / 0.15);
+    --shadow-hover: 0 12px 40px -16px hsl(var(--baby-blue-dark) / 0.25);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +131,47 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
   }
+}
+
+@layer components {
+  /* Baby-themed component styles */
+  .card-baby {
+    @apply bg-card shadow-[var(--shadow-card)] rounded-[var(--radius)] transition-[var(--transition-smooth)] hover:shadow-[var(--shadow-hover)];
+  }
+
+  .btn-baby-blue {
+    @apply bg-gradient-to-r from-[hsl(var(--baby-blue))] to-[hsl(var(--baby-blue-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
+  }
+
+  .btn-baby-pink {
+    @apply bg-gradient-to-r from-[hsl(var(--baby-pink))] to-[hsl(var(--baby-pink-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
+  }
+
+  .progress-bar {
+    @apply h-4 rounded-full overflow-hidden bg-muted;
+  }
+
+  .progress-fill {
+    @apply h-full transition-all duration-700 ease-out rounded-full;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s ease-in-out infinite;
 }

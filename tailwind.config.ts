@@ -52,6 +52,21 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Baby theme colors
+				baby: {
+					blue: 'hsl(var(--baby-blue))',
+					'blue-dark': 'hsl(var(--baby-blue-dark))',
+					pink: 'hsl(var(--baby-pink))', 
+					'pink-dark': 'hsl(var(--baby-pink-dark))',
+					purple: 'hsl(var(--baby-purple))',
+					'purple-dark': 'hsl(var(--baby-purple-dark))',
+					yellow: 'hsl(var(--baby-yellow))',
+					'yellow-dark': 'hsl(var(--baby-yellow-dark))',
+					mint: 'hsl(var(--baby-mint))',
+					'mint-dark': 'hsl(var(--baby-mint-dark))',
+					cream: 'hsl(var(--baby-cream))',
+					white: 'hsl(var(--baby-white))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -62,6 +77,22 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			fontFamily: {
+				'body': ['Inter', 'system-ui', 'sans-serif'],
+				'heading': ['Poppins', 'system-ui', 'sans-serif']
+			},
+			backgroundImage: {
+				'gradient-baby-blue': 'var(--gradient-baby-blue)',
+				'gradient-baby-pink': 'var(--gradient-baby-pink)',
+				'gradient-baby-purple': 'var(--gradient-baby-purple)',
+				'gradient-baby-mint': 'var(--gradient-baby-mint)',
+				'gradient-soft': 'var(--gradient-soft)'
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'card': 'var(--shadow-card)',
+				'hover': 'var(--shadow-hover)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +115,21 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'bounce-gentle': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 3s ease-in-out infinite',
+				'bounce-gentle': 'bounce-gentle 2s ease-in-out infinite'
 			}
 		}
 	},
