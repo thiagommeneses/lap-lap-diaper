@@ -13,47 +13,42 @@ import { DiaperStatsCard } from "@/components/DiaperStatsCard";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { useDiaperData } from "@/hooks/useDiaperData";
+
+const iconMap = {
+  Baby,
+  Heart,
+  Smile,
+  Star,
+};
 
 const Index = () => {
-  // Dados mockados para demonstração
-  const diaperData = [
-    {
-      title: "Recém-nascido",
-      icon: <Baby className="w-6 h-6 text-foreground" />,
-      count: 180,
-      total: 240,
-      ageRange: "0-2 meses",
-      color: "blue" as const
-    },
-    {
-      title: "Tamanho P",
-      icon: <Heart className="w-6 h-6 text-foreground" />,
-      count: 220,
-      total: 300,
-      ageRange: "2-6 meses", 
-      color: "pink" as const
-    },
-    {
-      title: "Tamanho M",
-      icon: <Smile className="w-6 h-6 text-foreground" />,
-      count: 150,
-      total: 280,
-      ageRange: "6-12 meses",
-      color: "purple" as const
-    },
-    {
-      title: "Tamanho G",
-      icon: <Star className="w-6 h-6 text-foreground" />,
-      count: 80,
-      total: 200,
-      ageRange: "12-24 meses",
-      color: "mint" as const
-    }
-  ];
+  const { 
+    ageGroups, 
+    loading, 
+    getTotalStock, 
+    getTotalTarget, 
+    getProgressPercentage,
+    getShoppingList,
+    getLowStockAlerts
+  } = useDiaperData();
 
-  const totalDiapers = diaperData.reduce((acc, item) => acc + item.count, 0);
-  const totalNeeded = diaperData.reduce((acc, item) => acc + item.total, 0);
-  const progressPercentage = Math.round((totalDiapers / totalNeeded) * 100);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const totalDiapers = getTotalStock();
+  const totalNeeded = getTotalTarget();
+  const progressPercentage = getProgressPercentage();
+  const shoppingList = getShoppingList();
+  const lowStockAlerts = getLowStockAlerts();
 
   return (
     <div className="min-h-screen bg-background">
@@ -108,9 +103,20 @@ const Index = () => {
             Estoque por Faixa Etária
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {diaperData.map((item, index) => (
-              <DiaperStatsCard key={index} {...item} />
-            ))}
+            {ageGroups.map((group) => {
+              const IconComponent = iconMap[group.icon_name as keyof typeof iconMap] || Baby;
+              return (
+                <DiaperStatsCard 
+                  key={group.id}
+                  title={group.name}
+                  icon={<IconComponent className="w-6 h-6 text-foreground" />}
+                  count={group.current_quantity}
+                  total={group.estimated_quantity}
+                  ageRange={group.age_range}
+                  color={group.color_theme as any}
+                />
+              );
+            })}
           </div>
         </div>
 
@@ -122,18 +128,23 @@ const Index = () => {
               Alertas de Estoque
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-baby-yellow/20 rounded-lg">
-                <span className="text-foreground">Tamanho M - Estoque Baixo</span>
-                <Badge variant="secondary" className="bg-baby-yellow text-foreground">
-                  Atenção
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-baby-mint/20 rounded-lg">
-                <span className="text-foreground">Recém-nascido - OK</span>
-                <Badge variant="secondary" className="bg-baby-mint text-foreground">
-                  Normal
-                </Badge>
-              </div>
+              {lowStockAlerts.length === 0 ? (
+                <div className="flex items-center justify-between p-3 bg-baby-mint/20 rounded-lg">
+                  <span className="text-foreground">Todos os estoques estão OK</span>
+                  <Badge variant="secondary" className="bg-baby-mint text-foreground">
+                    Normal
+                  </Badge>
+                </div>
+              ) : (
+                lowStockAlerts.map((alert) => (
+                  <div key={alert.id} className="flex items-center justify-between p-3 bg-baby-yellow/20 rounded-lg">
+                    <span className="text-foreground">{alert.name} - Estoque Baixo</span>
+                    <Badge variant="secondary" className="bg-baby-yellow text-foreground">
+                      Atenção
+                    </Badge>
+                  </div>
+                ))
+              )}
             </div>
           </Card>
           
@@ -142,23 +153,25 @@ const Index = () => {
               Lista de Compras Sugerida
             </h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center border-b border-border pb-2">
-                <span className="text-foreground">Tamanho M</span>
-                <span className="font-medium text-foreground">130 unidades</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-border pb-2">
-                <span className="text-foreground">Tamanho G</span>
-                <span className="font-medium text-foreground">120 unidades</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-border pb-2">
-                <span className="text-foreground">Recém-nascido</span>
-                <span className="font-medium text-foreground">60 unidades</span>
-              </div>
-              <div className="pt-2">
-                <div className="text-sm text-muted-foreground">
-                  Estimativa total: <span className="font-medium text-foreground">R$ 245,00</span>
-                </div>
-              </div>
+              {shoppingList.length === 0 ? (
+                <p className="text-muted-foreground">Estoque completo! 🎉</p>
+              ) : (
+                <>
+                  {shoppingList.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center border-b border-border pb-2">
+                      <span className="text-foreground">{item.name}</span>
+                      <span className="font-medium text-foreground">{item.needed} unidades</span>
+                    </div>
+                  ))}
+                  <div className="pt-2">
+                    <div className="text-sm text-muted-foreground">
+                      Estimativa total: <span className="font-medium text-foreground">
+                        R$ {shoppingList.reduce((acc, item) => acc + item.estimatedCost, 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </Card>
         </div>

@@ -29,10 +29,14 @@ export const DashboardHeader = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="btn-baby-pink">
+            <Button className="btn-baby-pink" onClick={() => window.location.href = '/admin'}>
               Ver Relatório Completo
             </Button>
-            <Button variant="outline" className="bg-baby-white/80 border-border hover:bg-baby-white">
+            <Button 
+              variant="outline" 
+              className="bg-baby-white/80 border-border hover:bg-baby-white"
+              onClick={() => window.location.href = '/auth'}
+            >
               <Settings className="w-4 h-4 mr-2" />
               Administração
             </Button>
