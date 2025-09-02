@@ -67,6 +67,7 @@ export type Database = {
           name: string
           price_per_unit: number | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
           age_range: string
@@ -78,6 +79,7 @@ export type Database = {
           name: string
           price_per_unit?: number | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
           age_range?: string
@@ -89,6 +91,7 @@ export type Database = {
           name?: string
           price_per_unit?: number | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -190,6 +193,7 @@ export type Database = {
           id: string
           last_updated_at: string | null
           notes: string | null
+          user_id: string | null
         }
         Insert: {
           age_group_id?: string | null
@@ -197,6 +201,7 @@ export type Database = {
           id?: string
           last_updated_at?: string | null
           notes?: string | null
+          user_id?: string | null
         }
         Update: {
           age_group_id?: string | null
@@ -204,6 +209,7 @@ export type Database = {
           id?: string
           last_updated_at?: string | null
           notes?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -224,6 +230,7 @@ export type Database = {
           notes: string | null
           quantity: number
           usage_date: string | null
+          user_id: string | null
         }
         Insert: {
           age_group_id?: string | null
@@ -233,6 +240,7 @@ export type Database = {
           notes?: string | null
           quantity: number
           usage_date?: string | null
+          user_id?: string | null
         }
         Update: {
           age_group_id?: string | null
@@ -242,6 +250,7 @@ export type Database = {
           notes?: string | null
           quantity?: number
           usage_date?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -252,6 +261,7 @@ export type Database = {
           subtitle: string | null
           title: string | null
           updated_at: string
+          user_id: string | null
           welcome_message: string | null
         }
         Insert: {
@@ -260,6 +270,7 @@ export type Database = {
           subtitle?: string | null
           title?: string | null
           updated_at?: string
+          user_id?: string | null
           welcome_message?: string | null
         }
         Update: {
@@ -268,6 +279,7 @@ export type Database = {
           subtitle?: string | null
           title?: string | null
           updated_at?: string
+          user_id?: string | null
           welcome_message?: string | null
         }
         Relationships: []
@@ -301,7 +313,23 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      recent_donors: {
+        Row: {
+          age_group_name: string | null
+          donation_date: string | null
+          donor_name: string | null
+          quantity: number | null
+        }
+        Relationships: []
+      }
+      top_donors: {
+        Row: {
+          donation_count: number | null
+          donor_name: string | null
+          total_donated: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_donation_stats: {
