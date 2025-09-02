@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, Users, Settings, Crown, UserCheck, UserX } from 'lucide-react';
+import { Shield, Users, Settings, Crown, UserCheck, UserX, Edit, Trash2, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { EditUserModal } from '@/components/EditUserModal';
+import { AddUserModal } from '@/components/AddUserModal';
 
 interface UserData {
   id: string;
@@ -26,6 +29,9 @@ const SuperAdmin = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingUser, setUpdatingUser] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<UserData | null>(null);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -67,6 +73,25 @@ const SuperAdmin = () => {
       toast.error('Erro ao atualizar status: ' + error.message);
     } finally {
       setUpdatingUser(null);
+    }
+  };
+
+  const deleteUser = async (userId: string) => {
+    setDeletingUser(userId);
+    
+    try {
+      const { error } = await supabase.rpc('delete_user', {
+        target_user_id: userId
+      });
+
+      if (error) throw error;
+
+      toast.success('Usuário removido com sucesso');
+      fetchUsers();
+    } catch (error: any) {
+      toast.error('Erro ao remover usuário: ' + error.message);
+    } finally {
+      setDeletingUser(null);
     }
   };
 
@@ -149,9 +174,15 @@ const SuperAdmin = () => {
 
         {/* Users Table */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold font-heading text-foreground mb-6">
-            Gerenciamento de Usuários
-          </h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold font-heading text-foreground">
+              Gerenciamento de Usuários
+            </h2>
+            <Button onClick={() => setShowAddUser(true)}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              Adicionar Usuário
+            </Button>
+          </div>
           
           <div className="overflow-x-auto">
             <Table>
@@ -207,28 +238,68 @@ const SuperAdmin = () => {
                       {format(new Date(userData.created_at), 'dd/MM/yyyy', { locale: ptBR })}
                     </TableCell>
                     <TableCell>
-                      {!userData.super_admin && (
+                      <div className="flex gap-2">
                         <Button
                           size="sm"
-                          variant={userData.is_admin ? "destructive" : "default"}
-                          onClick={() => toggleAdminStatus(userData.id, userData.is_admin)}
-                          disabled={updatingUser === userData.id}
+                          variant="outline"
+                          onClick={() => setEditingUser(userData)}
                         >
-                          {updatingUser === userData.id ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
-                          ) : userData.is_admin ? (
-                            <>
-                              <UserX className="w-4 h-4 mr-1" />
-                              Remover Admin
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="w-4 h-4 mr-1" />
-                              Tornar Admin
-                            </>
-                          )}
+                          <Edit className="w-4 h-4" />
                         </Button>
-                      )}
+                        
+                        {!userData.super_admin && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant={userData.is_admin ? "destructive" : "default"}
+                              onClick={() => toggleAdminStatus(userData.id, userData.is_admin)}
+                              disabled={updatingUser === userData.id}
+                            >
+                              {updatingUser === userData.id ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                              ) : userData.is_admin ? (
+                                <UserX className="w-4 h-4" />
+                              ) : (
+                                <UserCheck className="w-4 h-4" />
+                              )}
+                            </Button>
+                            
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  disabled={deletingUser === userData.id}
+                                >
+                                  {deletingUser === userData.id ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                                  ) : (
+                                    <Trash2 className="w-4 h-4" />
+                                  )}
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Tem certeza que deseja excluir o usuário <strong>{userData.email}</strong>? 
+                                    Esta ação não pode ser desfeita e todos os dados do usuário serão removidos.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => deleteUser(userData.id)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Excluir
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -237,6 +308,20 @@ const SuperAdmin = () => {
           </div>
         </Card>
       </div>
+      
+      {/* Modals */}
+      <EditUserModal
+        user={editingUser}
+        isOpen={!!editingUser}
+        onClose={() => setEditingUser(null)}
+        onSuccess={fetchUsers}
+      />
+      
+      <AddUserModal
+        isOpen={showAddUser}
+        onClose={() => setShowAddUser(false)}
+        onSuccess={fetchUsers}
+      />
     </div>
   );
 };

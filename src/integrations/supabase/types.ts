@@ -322,6 +322,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_user_admin: {
+        Args: {
+          make_admin?: boolean
+          user_display_name?: string
+          user_email: string
+          user_password: string
+        }
+        Returns: string
+      }
+      delete_user: {
+        Args: { target_user_id: string }
+        Returns: undefined
+      }
       generate_url_slug: {
         Args: { input_name: string }
         Returns: string
@@ -376,6 +389,14 @@ export type Database = {
       }
       update_user_admin_status: {
         Args: { new_admin_status: boolean; target_user_id: string }
+        Returns: undefined
+      }
+      update_user_data: {
+        Args: {
+          new_display_name?: string
+          new_email?: string
+          target_user_id: string
+        }
         Returns: undefined
       }
     }
