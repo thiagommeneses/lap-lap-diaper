@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { Gift, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import InputMask from 'react-input-mask';
 
 interface AgeGroup {
   id: string;
@@ -21,6 +22,7 @@ interface DonationForm {
   quantity: number;
   donor_name: string;
   donor_contact: string;
+  donor_email: string;
   notes: string;
 }
 
@@ -34,6 +36,7 @@ const RegisterDonation = () => {
     quantity: 0,
     donor_name: '',
     donor_contact: '',
+    donor_email: '',
     notes: ''
   });
 
@@ -78,6 +81,7 @@ const RegisterDonation = () => {
           quantity: donationForm.quantity,
           donor_name: donationForm.donor_name,
           donor_contact: donationForm.donor_contact,
+          donor_email: donationForm.donor_email,
           notes: donationForm.notes,
           created_by: user?.id
         });
@@ -90,6 +94,7 @@ const RegisterDonation = () => {
         quantity: 0,
         donor_name: '',
         donor_contact: '',
+        donor_email: '',
         notes: ''
       });
     } catch (error: any) {
@@ -161,7 +166,7 @@ const RegisterDonation = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="donor-name">Nome do Doador</Label>
                 <Input
@@ -171,12 +176,26 @@ const RegisterDonation = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="donor-contact">Contato do Doador</Label>
+                <Label htmlFor="donor-email">Email do Doador</Label>
                 <Input
-                  id="donor-contact"
+                  id="donor-email"
+                  type="email"
+                  value={donationForm.donor_email}
+                  onChange={(e) => setDonationForm({ ...donationForm, donor_email: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="donor-contact">Contato do Doador</Label>
+                <InputMask
+                  mask="(99) 99999-9999"
                   value={donationForm.donor_contact}
                   onChange={(e) => setDonationForm({ ...donationForm, donor_contact: e.target.value })}
-                />
+                >
+                  <Input
+                    id="donor-contact"
+                    placeholder="(11) 99999-9999"
+                  />
+                </InputMask>
               </div>
             </div>
 
