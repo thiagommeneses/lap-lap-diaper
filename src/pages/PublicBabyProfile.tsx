@@ -9,7 +9,11 @@ import {
   Calendar,
   MapPin,
   Users,
-  CheckCircle
+  CheckCircle,
+  Gift,
+  Trophy,
+  Clock,
+  TrendingUp
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -25,6 +29,27 @@ interface DiaperGroup {
   color_theme: string;
   icon_name: string;
   progress_percentage: number;
+}
+
+interface TopDonor {
+  name: string;
+  total_quantity: number;
+  donation_count: number;
+}
+
+interface RecentDonor {
+  name: string;
+  quantity: number;
+  age_group_name: string;
+  donation_date: string;
+  created_at: string;
+}
+
+interface DonationData {
+  top_donors: TopDonor[];
+  recent_donors: RecentDonor[];
+  total_donations: number;
+  total_donated: number;
 }
 
 interface BabyProfile {
@@ -52,11 +77,12 @@ const iconMap = {
 const PublicBabyProfile = () => {
   const { slug } = useParams<{ slug: string }>();
   const [profile, setProfile] = useState<BabyProfile | null>(null);
+  const [donationData, setDonationData] = useState<DonationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       if (!slug) {
         setNotFound(true);
         setLoading(false);
@@ -64,23 +90,24 @@ const PublicBabyProfile = () => {
       }
 
       try {
-        const { data, error } = await supabase.rpc('get_baby_profile_by_slug', {
+        // Buscar perfil do bebê
+        const { data: profileData, error: profileError } = await supabase.rpc('get_baby_profile_by_slug', {
           baby_slug: slug
         });
 
-        if (error) throw error;
+        if (profileError) throw profileError;
 
-        if (!data || data.length === 0) {
+        if (!profileData || profileData.length === 0) {
           setNotFound(true);
         } else {
-          const profileData = data[0];
+          const profile = profileData[0];
           // Parse diaper_groups JSON if it's a string
           let diaperGroups: DiaperGroup[] = [];
-          if (profileData.diaper_groups) {
+          if (profile.diaper_groups) {
             try {
-              diaperGroups = typeof profileData.diaper_groups === 'string' 
-                ? JSON.parse(profileData.diaper_groups)
-                : profileData.diaper_groups;
+              diaperGroups = typeof profile.diaper_groups === 'string' 
+                ? JSON.parse(profile.diaper_groups)
+                : profile.diaper_groups;
             } catch (e) {
               console.warn('Failed to parse diaper_groups:', e);
               diaperGroups = [];
@@ -88,20 +115,37 @@ const PublicBabyProfile = () => {
           }
           
           setProfile({
-            ...profileData,
+            ...profile,
             diaper_groups: diaperGroups
           });
+
+          // Buscar dados dos doadores
+          const { data: donationData, error: donationError } = await supabase.rpc('get_donation_data_by_slug', {
+            baby_slug: slug
+          });
+
+          if (donationError) {
+            console.warn('Erro ao buscar dados dos doadores:', donationError);
+          } else if (donationData && donationData.length > 0) {
+            const donation = donationData[0];
+            setDonationData({
+              top_donors: typeof donation.top_donors === 'string' ? JSON.parse(donation.top_donors) : donation.top_donors,
+              recent_donors: typeof donation.recent_donors === 'string' ? JSON.parse(donation.recent_donors) : donation.recent_donors,
+              total_donations: donation.total_donations,
+              total_donated: donation.total_donated
+            });
+          }
         }
       } catch (error: any) {
-        console.error('Erro ao buscar perfil do bebê:', error);
-        toast.error('Erro ao carregar perfil do bebê');
+        console.error('Erro ao buscar dados:', error);
+        toast.error('Erro ao carregar dados');
         setNotFound(true);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, [slug]);
 
   if (loading) {
@@ -217,7 +261,7 @@ const PublicBabyProfile = () => {
         </Card>
 
         {/* Stock Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="card-baby p-6 text-center">
             <div className="bg-gradient-baby-blue p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <Package className="w-8 h-8 text-foreground" />
@@ -241,6 +285,14 @@ const PublicBabyProfile = () => {
             <h3 className="text-2xl font-bold font-heading text-foreground">{progressPercentage}%</h3>
             <p className="text-muted-foreground">Progresso</p>
           </Card>
+
+          <Card className="card-baby p-6 text-center">
+            <div className="bg-gradient-baby-yellow p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Gift className="w-8 h-8 text-foreground" />
+            </div>
+            <h3 className="text-2xl font-bold font-heading text-foreground">{donationData?.total_donated || 0}</h3>
+            <p className="text-muted-foreground">Fraldas Doadas</p>
+          </Card>
         </div>
 
         {/* Progress Bar */}
@@ -257,6 +309,96 @@ const PublicBabyProfile = () => {
             <span>Meta: {totalTarget} fraldas</span>
           </div>
         </Card>
+
+        {/* Donation Stats */}
+        {donationData && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <Card className="card-baby p-6">
+              <h3 className="text-lg font-semibold font-heading text-foreground mb-4 flex items-center">
+                <Trophy className="w-5 h-5 mr-2 text-baby-yellow" />
+                Top 3 Doadores
+              </h3>
+              <div className="space-y-3">
+                {donationData.top_donors.length === 0 ? (
+                  <p className="text-muted-foreground">Nenhum doador ainda</p>
+                ) : (
+                  donationData.top_donors.map((donor, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-foreground ${
+                          index === 0 ? 'bg-baby-yellow' : 
+                          index === 1 ? 'bg-baby-mint' : 'bg-baby-pink'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <span className="text-foreground font-medium">{donor.name}</span>
+                          <p className="text-sm text-muted-foreground">
+                            {donor.donation_count} doações
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="bg-baby-blue text-foreground">
+                        {donor.total_quantity} fraldas
+                      </Badge>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+            
+            <Card className="card-baby p-6">
+              <h3 className="text-lg font-semibold font-heading text-foreground mb-4 flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-baby-mint" />
+                Últimas Doações
+              </h3>
+              <div className="space-y-3">
+                {donationData.recent_donors.length === 0 ? (
+                  <p className="text-muted-foreground">Nenhuma doação recente</p>
+                ) : (
+                  donationData.recent_donors.map((donor, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                      <div>
+                        <span className="text-foreground font-medium">{donor.name}</span>
+                        <p className="text-sm text-muted-foreground">
+                          {donor.age_group_name} • {formatDate(donor.donation_date)}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="bg-baby-pink text-foreground">
+                        {donor.quantity} fraldas
+                      </Badge>
+                    </div>
+                  ))
+                )}
+              </div>
+            </Card>
+
+            <Card className="card-baby p-6">
+              <h3 className="text-lg font-semibold font-heading text-foreground mb-4 flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-baby-blue" />
+                Estatísticas de Doação
+              </h3>
+              <div className="space-y-4">
+                <div className="text-center p-4 bg-baby-mint/20 rounded-lg">
+                  <div className="text-2xl font-bold text-foreground">{donationData.total_donations}</div>
+                  <p className="text-sm text-muted-foreground">Total de Doações</p>
+                </div>
+                <div className="text-center p-4 bg-baby-yellow/20 rounded-lg">
+                  <div className="text-2xl font-bold text-foreground">{donationData.total_donated}</div>
+                  <p className="text-sm text-muted-foreground">Fraldas Recebidas</p>
+                </div>
+                {donationData.total_donations > 0 && (
+                  <div className="text-center p-4 bg-baby-blue/20 rounded-lg">
+                    <div className="text-lg font-bold text-foreground">
+                      {Math.round(donationData.total_donated / donationData.total_donations)}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Média por Doação</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+        )}
 
         {/* Diaper Groups */}
         {profile.diaper_groups.length > 0 && (

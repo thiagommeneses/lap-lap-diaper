@@ -359,6 +359,15 @@ export type Database = {
           welcome_message: string
         }[]
       }
+      get_donation_data_by_slug: {
+        Args: { baby_slug: string }
+        Returns: {
+          recent_donors: Json
+          top_donors: Json
+          total_donated: number
+          total_donations: number
+        }[]
+      }
       get_donation_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
