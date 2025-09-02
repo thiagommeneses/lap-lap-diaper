@@ -16,7 +16,6 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { BabyInfoDisplay } from "@/components/BabyInfoDisplay";
 import { useDiaperData } from "@/hooks/useDiaperData";
-import { useDonorData } from "@/hooks/useDonorData";
 import { useAuth } from "@/contexts/AuthContext";
 
 const iconMap = {
@@ -40,14 +39,8 @@ const Index = () => {
     getTotalUsage,
     getUsageByAgeGroup
   } = useDiaperData();
-  
-  const { 
-    recentDonors, 
-    topDonors, 
-    loading: donorsLoading 
-  } = useDonorData();
 
-  if (loading || donorsLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -58,80 +51,14 @@ const Index = () => {
     );
   }
 
-  // Para usuários não autenticados, mostrar página pública com doadores
+  // Para usuários não autenticados, mostrar página pública simples
   if (!user) {
     return (
       <div className="bg-background">
         <div className="container mx-auto px-4 py-8">
           <DashboardHeader />
           
-          {/* Seção para visitantes - Listas de doadores */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Últimos Doadores */}
-            <Card className="card-baby p-6">
-              <h2 className="text-xl font-bold font-heading text-foreground mb-4 text-center flex items-center justify-center">
-                <Heart className="w-6 h-6 mr-2 text-baby-pink" />
-                Últimos Doadores ❤️
-              </h2>
-              <div className="space-y-4">
-                {recentDonors.length === 0 ? (
-                  <p className="text-muted-foreground text-center">Nenhuma doação recente</p>
-                ) : (
-                  recentDonors.map((donor, index) => (
-                    <div key={index} className="bg-gradient-baby-pink/20 p-4 rounded-lg border border-baby-pink/30">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold text-foreground">{donor.donor_name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {donor.age_group_name} • {new Date(donor.donation_date).toLocaleDateString('pt-BR')}
-                          </p>
-                        </div>
-                        <Badge variant="secondary" className="bg-baby-pink text-foreground">
-                          {donor.quantity} fraldas
-                        </Badge>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </Card>
-
-            {/* Top Doadores */}
-            <Card className="card-baby p-6">
-              <h2 className="text-xl font-bold font-heading text-foreground mb-4 text-center flex items-center justify-center">
-                <Star className="w-6 h-6 mr-2 text-baby-yellow" />
-                Top Doadores 🌟
-              </h2>
-              <div className="space-y-4">
-                {topDonors.length === 0 ? (
-                  <p className="text-muted-foreground text-center">Nenhum doador ainda</p>
-                ) : (
-                  topDonors.map((donor, index) => (
-                    <div key={index} className="bg-gradient-baby-yellow/20 p-4 rounded-lg border border-baby-yellow/30">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-baby-yellow rounded-full flex items-center justify-center text-foreground font-bold mr-3">
-                            {index + 1}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-foreground">{donor.donor_name}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {donor.donation_count} doações
-                            </p>
-                          </div>
-                        </div>
-                        <Badge variant="secondary" className="bg-baby-yellow text-foreground">
-                          {donor.total_donated} fraldas
-                        </Badge>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </Card>
-          </div>
-
-          {/* Call to Action para visitantes */}
+          {/* Seção pública simplificada - sem dados sensíveis */}
           <Card className="card-baby p-8 text-center">
             <Baby className="w-16 h-16 mx-auto mb-4 text-baby-blue" />
             <h2 className="text-2xl font-bold font-heading text-foreground mb-4">
@@ -140,8 +67,25 @@ const Index = () => {
             <p className="text-muted-foreground mb-6">
               Crie sua conta para gerenciar o estoque de fraldas do seu bebê e acompanhar seu crescimento.
             </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-gradient-baby-blue/20 p-4 rounded-lg">
+                <Package className="w-8 h-8 mx-auto mb-2 text-baby-blue" />
+                <h3 className="font-semibold text-foreground">Controle de Estoque</h3>
+                <p className="text-sm text-muted-foreground">Gerencie o estoque de fraldas por faixa etária</p>
+              </div>
+              <div className="bg-gradient-baby-pink/20 p-4 rounded-lg">
+                <TrendingUp className="w-8 h-8 mx-auto mb-2 text-baby-pink" />
+                <h3 className="font-semibold text-foreground">Relatórios</h3>
+                <p className="text-sm text-muted-foreground">Acompanhe o consumo e planeje compras</p>
+              </div>
+              <div className="bg-gradient-baby-mint/20 p-4 rounded-lg">
+                <CheckCircle className="w-8 h-8 mx-auto mb-2 text-baby-mint" />
+                <h3 className="font-semibold text-foreground">Dados Privados</h3>
+                <p className="text-sm text-muted-foreground">Seus dados ficam seguros e privados</p>
+              </div>
+            </div>
             <Badge variant="secondary" className="bg-baby-mint text-foreground px-6 py-2 text-lg">
-              Sistema privado e seguro para cada família
+              Sistema privado e seguro para cada família 🔒
             </Badge>
           </Card>
         </div>

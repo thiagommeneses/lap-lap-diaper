@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Type, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PageSettings {
   id?: string;
@@ -17,6 +18,7 @@ interface PageSettings {
 
 export const PageSettingsConfig = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [settings, setSettings] = useState<PageSettings>({
     title: "",
     subtitle: "",
@@ -82,7 +84,8 @@ export const PageSettingsConfig = () => {
           .insert({
             title: settings.title,
             subtitle: settings.subtitle,
-            welcome_message: settings.welcome_message
+            welcome_message: settings.welcome_message,
+            user_id: user?.id
           })
           .select()
           .single();

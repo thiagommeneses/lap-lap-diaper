@@ -313,23 +313,7 @@ export type Database = {
       }
     }
     Views: {
-      recent_donors: {
-        Row: {
-          age_group_name: string | null
-          donation_date: string | null
-          donor_name: string | null
-          quantity: number | null
-        }
-        Relationships: []
-      }
-      top_donors: {
-        Row: {
-          donation_count: number | null
-          donor_name: string | null
-          total_donated: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_donation_stats: {
