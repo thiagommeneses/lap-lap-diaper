@@ -316,23 +316,7 @@ export type Database = {
       }
     }
     Views: {
-      baby_profiles: {
-        Row: {
-          birth_date: string | null
-          birth_place: string | null
-          diaper_groups: Json | null
-          gender: string | null
-          is_born: boolean | null
-          name: string | null
-          parent1_name: string | null
-          parent2_name: string | null
-          subtitle: string | null
-          title: string | null
-          url_slug: string | null
-          welcome_message: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       generate_url_slug: {
