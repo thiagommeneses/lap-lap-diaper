@@ -33,7 +33,7 @@ export const DashboardHeader = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="btn-baby-pink" onClick={() => navigate('/admin')}>
-              Ver Relatório Completo
+              Administração
             </Button>
             <Button 
               variant="outline" 
@@ -41,7 +41,7 @@ export const DashboardHeader = () => {
               onClick={() => navigate('/auth')}
             >
               <Settings className="w-4 h-4 mr-2" />
-              Administração
+              Login
             </Button>
           </div>
         </div>
