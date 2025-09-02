@@ -1,8 +1,11 @@
 import { Baby, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/baby-hero.jpg";
 
 export const DashboardHeader = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className="relative overflow-hidden rounded-3xl mb-8">
       <div 
@@ -29,13 +32,13 @@ export const DashboardHeader = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="btn-baby-pink" onClick={() => window.location.href = '/admin'}>
+            <Button className="btn-baby-pink" onClick={() => navigate('/admin')}>
               Ver Relatório Completo
             </Button>
             <Button 
               variant="outline" 
               className="bg-baby-white/80 border-border hover:bg-baby-white"
-              onClick={() => window.location.href = '/auth'}
+              onClick={() => navigate('/auth')}
             >
               <Settings className="w-4 h-4 mr-2" />
               Administração
