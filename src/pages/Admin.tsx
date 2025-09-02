@@ -54,6 +54,7 @@ const Admin = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingAgeGroups, setEditingAgeGroups] = useState<{[key: string]: AgeGroup}>({});
+  const [editingStocks, setEditingStocks] = useState<{[key: string]: number}>({});
   const [donationForm, setDonationForm] = useState<DonationForm>({
     age_group_id: '',
     quantity: 0,
@@ -371,10 +372,36 @@ const Admin = () => {
                         <Label className="text-sm">Quantidade:</Label>
                         <Input
                           type="number"
-                          value={stock?.current_quantity || 0}
+                          value={editingStocks[stock?.id || ''] !== undefined 
+                            ? editingStocks[stock?.id || ''] 
+                            : (stock?.current_quantity || 0)}
                           onChange={(e) => {
                             if (stock) {
-                              handleUpdateStock(stock.id, parseInt(e.target.value) || 0);
+                              setEditingStocks(prev => ({
+                                ...prev,
+                                [stock.id]: parseInt(e.target.value) || 0
+                              }));
+                            }
+                          }}
+                          onBlur={(e) => {
+                            if (stock && editingStocks[stock.id] !== undefined) {
+                              handleUpdateStock(stock.id, editingStocks[stock.id]);
+                              setEditingStocks(prev => {
+                                const newState = { ...prev };
+                                delete newState[stock.id];
+                                return newState;
+                              });
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && stock && editingStocks[stock.id] !== undefined) {
+                              handleUpdateStock(stock.id, editingStocks[stock.id]);
+                              setEditingStocks(prev => {
+                                const newState = { ...prev };
+                                delete newState[stock.id];
+                                return newState;
+                              });
+                              e.currentTarget.blur();
                             }
                           }}
                           className="flex-1"
