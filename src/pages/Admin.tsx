@@ -60,6 +60,48 @@ const Admin = () => {
     }
     
     fetchData();
+
+    // Setup real-time subscriptions
+    const ageGroupsChannel = supabase
+      .channel('admin-age-groups-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'diaper_age_groups'
+        },
+        (payload) => {
+          console.log('Age groups changed:', payload);
+          // Use callback to get current state
+          setEditingAgeGroups(currentEditing => {
+            // Only refetch if we're not currently editing to avoid conflicts
+            if (Object.keys(currentEditing).length === 0) {
+              fetchData();
+            }
+            return currentEditing;
+          });
+        }
+      )
+      .subscribe();
+
+    const stockChannel = supabase
+      .channel('admin-stock-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'diaper_stock'
+        },
+        () => fetchData()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ageGroupsChannel);
+      supabase.removeChannel(stockChannel);
+    };
   }, [user, navigate]);
 
   const fetchData = async () => {
@@ -150,16 +192,23 @@ const Admin = () => {
 
       if (error) throw error;
 
-      toast.success('Configuração atualizada com sucesso!');
-      
+      // Update local state immediately to prevent flicker
+      setAgeGroups(prev => prev.map(group => 
+        group.id === ageGroupId 
+          ? { ...group, ...updatedData }
+          : group
+      ));
+
       // Remove from editing state
       setEditingAgeGroups(prev => {
         const newState = { ...prev };
         delete newState[ageGroupId];
         return newState;
       });
+
+      toast.success('Configuração atualizada com sucesso!');
       
-      fetchData();
+      // No need to call fetchData() - real-time subscription will handle it
     } catch (error: any) {
       toast.error('Erro ao atualizar configuração: ' + error.message);
     }
