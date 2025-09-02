@@ -26,7 +26,8 @@ import {
   AlertTriangle,
   DollarSign,
   Users,
-  Calendar
+  Calendar,
+  Minus
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -43,11 +44,16 @@ interface ReportData {
     donations: number;
     quantity: number;
   }>;
+  monthlyUsage: Array<{
+    month: string;
+    usage: number;
+  }>;
   ageGroupStats: Array<{
     name: string;
     current: number;
     target: number;
     donations: number;
+    usage: number;
     percentage: number;
     color: string;
   }>;
@@ -86,6 +92,15 @@ export const Reports = () => {
         `)
         .order('created_at', { ascending: false });
 
+      // Buscar dados de uso
+      const { data: usage } = await supabase
+        .from('diaper_usage')
+        .select(`
+          *,
+          diaper_age_groups(name, color_theme)
+        `)
+        .order('created_at', { ascending: false });
+
       if (!ageGroups || !donations) return;
 
       // Calcular totais
@@ -107,15 +122,15 @@ export const Reports = () => {
         return acc + (donation.quantity * (ageGroup?.price_per_unit || 0));
       }, 0);
 
-      // Assumindo que "total usado" é a diferença entre doações recebidas e estoque atual
-      const totalUsed = Math.max(0, totalDonationQuantity - totalStock);
+      // Calcular total usado baseado nos registros de uso
+      const totalUsed = (usage || []).reduce((acc, u) => acc + u.quantity, 0);
       
       // Para "total comprado", vamos calcular baseado no que falta para atingir as metas
       const totalNeeded = Math.max(0, totalTarget - totalStock);
       const totalPurchased = totalNeeded; // Simplificação para o exemplo
 
       // Dados mensais das doações
-      const monthlyData = donations.reduce((acc: any, donation) => {
+      const monthlyData = (donations || []).reduce((acc: any, donation) => {
         const date = new Date(donation.donation_date);
         const monthKey = date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
         
@@ -127,15 +142,33 @@ export const Reports = () => {
         return acc;
       }, {});
 
+      // Dados mensais de uso
+      const monthlyUsageData = (usage || []).reduce((acc: any, use) => {
+        const date = new Date(use.usage_date);
+        const monthKey = date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+        
+        if (!acc[monthKey]) {
+          acc[monthKey] = 0;
+        }
+        acc[monthKey] += use.quantity;
+        return acc;
+      }, {});
+
       const monthlyDonations = Object.entries(monthlyData).map(([month, data]: [string, any]) => ({
         month,
         donations: data.donations,
         quantity: data.quantity,
       })).slice(-6); // Últimos 6 meses
 
+      const monthlyUsage = Object.entries(monthlyUsageData).map(([month, total]: [string, any]) => ({
+        month,
+        usage: total,
+      })).slice(-6); // Últimos 6 meses
+
       // Estatísticas por faixa etária
       const ageGroupStats = ageGroups.map((group, index) => {
-        const groupDonations = donations.filter(d => d.age_group_id === group.id);
+        const groupDonations = (donations || []).filter(d => d.age_group_id === group.id);
+        const groupUsage = (usage || []).filter(u => u.age_group_id === group.id);
         const current = group.diaper_stock?.[0]?.current_quantity || 0;
         const target = group.estimated_quantity;
         const percentage = target > 0 ? Math.round((current / target) * 100) : 0;
@@ -145,6 +178,7 @@ export const Reports = () => {
           current,
           target,
           donations: groupDonations.reduce((acc, d) => acc + d.quantity, 0),
+          usage: groupUsage.reduce((acc, u) => acc + u.quantity, 0),
           percentage,
           color: COLORS[index % COLORS.length],
         };
@@ -164,6 +198,7 @@ export const Reports = () => {
         totalUsed,
         totalPurchased,
         monthlyDonations,
+        monthlyUsage,
         ageGroupStats,
         donationsByMonth,
       });
@@ -221,7 +256,7 @@ export const Reports = () => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="card-baby p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -251,6 +286,16 @@ export const Reports = () => {
               <p className="text-2xl font-bold text-foreground">{reportData.totalStock}</p>
             </div>
             <Package className="w-8 h-8 text-baby-blue" />
+          </div>
+        </Card>
+
+        <Card className="card-baby p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Usado</p>
+              <p className="text-2xl font-bold text-foreground">{reportData.totalUsed}</p>
+            </div>
+            <Minus className="w-8 h-8 text-baby-yellow" />
           </div>
         </Card>
 
@@ -302,10 +347,45 @@ export const Reports = () => {
           </ResponsiveContainer>
         </Card>
 
-        {/* Estoque por Faixa Etária */}
+        {/* Uso por Mês */}
         <Card className="card-baby p-6">
           <h3 className="text-lg font-semibold font-heading text-foreground mb-4">
-            Estoque por Faixa Etária
+            Uso por Mês
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={reportData.monthlyUsage}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis 
+                dataKey="month" 
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+              />
+              <YAxis 
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="usage" 
+                stroke="hsl(var(--baby-yellow))" 
+                fill="hsl(var(--baby-yellow))"
+                fillOpacity={0.3}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Card>
+
+        {/* Estoque vs Uso por Faixa Etária */}
+        <Card className="card-baby p-6">
+          <h3 className="text-lg font-semibold font-heading text-foreground mb-4">
+            Estoque vs Uso por Faixa Etária
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={reportData.ageGroupStats}>
@@ -326,8 +406,8 @@ export const Reports = () => {
                   borderRadius: '8px'
                 }}
               />
-              <Bar dataKey="current" fill="hsl(var(--baby-mint))" name="Atual" />
-              <Bar dataKey="target" fill="hsl(var(--baby-pink))" name="Meta" />
+              <Bar dataKey="current" fill="hsl(var(--baby-mint))" name="Estoque" />
+              <Bar dataKey="usage" fill="hsl(var(--baby-yellow))" name="Usado" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -403,7 +483,7 @@ export const Reports = () => {
       {/* Resumo de Performance */}
       <Card className="card-baby p-6">
         <h3 className="text-lg font-semibold font-heading text-foreground mb-4">
-          Resumo de Performance por Faixa Etária
+          Performance e Uso por Faixa Etária
         </h3>
         <div className="space-y-4">
           {reportData.ageGroupStats.map((stat, index) => (
@@ -416,7 +496,7 @@ export const Reports = () => {
                 <div>
                   <p className="font-medium text-foreground">{stat.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {stat.current} / {stat.target} unidades
+                    Estoque: {stat.current} / {stat.target} | Usado: {stat.usage}
                   </p>
                 </div>
               </div>

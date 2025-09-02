@@ -6,7 +6,8 @@ import {
   TrendingUp, 
   Package,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Minus
 } from "lucide-react";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { DiaperStatsCard } from "@/components/DiaperStatsCard";
@@ -32,7 +33,9 @@ const Index = () => {
     getProgressPercentage,
     getShoppingList,
     getLowStockAlerts,
-    getMonthlyAverage
+    getMonthlyAverage,
+    getTotalUsage,
+    getUsageByAgeGroup
   } = useDiaperData();
 
   if (loading) {
@@ -52,6 +55,8 @@ const Index = () => {
   const shoppingList = getShoppingList();
   const lowStockAlerts = getLowStockAlerts();
   const monthlyAverages = getMonthlyAverage();
+  const totalUsage = getTotalUsage();
+  const usageByAgeGroup = getUsageByAgeGroup();
 
   return (
     <div className="bg-background">
@@ -60,7 +65,7 @@ const Index = () => {
         <BabyInfoDisplay />
         
         {/* Resumo Geral */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="card-baby p-6 text-center">
             <div className="bg-gradient-baby-blue p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               <Package className="w-8 h-8 text-foreground" />
@@ -83,6 +88,14 @@ const Index = () => {
             </div>
             <h3 className="text-2xl font-bold font-heading text-foreground">{progressPercentage}%</h3>
             <p className="text-muted-foreground">Progresso Geral</p>
+          </Card>
+
+          <Card className="card-baby p-6 text-center">
+            <div className="bg-gradient-baby-yellow p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Minus className="w-8 h-8 text-foreground" />
+            </div>
+            <h3 className="text-2xl font-bold font-heading text-foreground">{totalUsage}</h3>
+            <p className="text-muted-foreground">Usadas (30 dias)</p>
           </Card>
         </div>
 
@@ -127,7 +140,7 @@ const Index = () => {
         </div>
 
         {/* Alertas e Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="card-baby p-6">
             <h3 className="text-lg font-semibold font-heading text-foreground mb-4 flex items-center">
               <AlertCircle className="w-5 h-5 mr-2 text-yellow-600" />
@@ -177,6 +190,32 @@ const Index = () => {
                     </div>
                   </div>
                 </>
+              )}
+            </div>
+          </Card>
+
+          <Card className="card-baby p-6">
+            <h3 className="text-lg font-semibold font-heading text-foreground mb-4 flex items-center">
+              <Minus className="w-5 h-5 mr-2 text-baby-blue" />
+              Uso por Faixa Etária (30 dias)
+            </h3>
+            <div className="space-y-3">
+              {usageByAgeGroup.length === 0 ? (
+                <p className="text-muted-foreground">Nenhum uso registrado</p>
+              ) : (
+                usageByAgeGroup.map((usage) => (
+                  <div key={usage.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                    <div>
+                      <span className="text-foreground font-medium">{usage.name}</span>
+                      <p className="text-sm text-muted-foreground">
+                        {usage.averageDaily} por dia (média)
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="bg-baby-blue text-foreground">
+                      {usage.totalUsed} usadas
+                    </Badge>
+                  </div>
+                ))
               )}
             </div>
           </Card>

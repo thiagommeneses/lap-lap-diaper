@@ -21,9 +21,18 @@ export interface DonationData {
   age_group_name: string;
 }
 
+export interface UsageData {
+  id: string;
+  quantity: number;
+  usage_date: string;
+  age_group_name: string;
+  notes?: string;
+}
+
 export const useDiaperData = () => {
   const [ageGroups, setAgeGroups] = useState<AgeGroupWithStock[]>([]);
   const [donations, setDonations] = useState<DonationData[]>([]);
+  const [usage, setUsage] = useState<UsageData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -42,6 +51,7 @@ export const useDiaperData = () => {
       // SEGURANÇA: Não tentar buscar detalhes de doações para usuários não autenticados
       // Apenas administradores podem ver informações pessoais dos doadores
       let donationsData = [];
+      let usageData = [];
       try {
         const { data: user } = await supabase.auth.getUser();
         if (user.user) {
@@ -64,6 +74,18 @@ export const useDiaperData = () => {
             
             donationsData = adminDonations || [];
           }
+
+          // Buscar dados de uso (disponível para usuários autenticados)
+          const { data: userUsage } = await supabase
+            .from('diaper_usage')
+            .select(`
+              *,
+              diaper_age_groups(name)
+            `)
+            .order('created_at', { ascending: false })
+            .limit(20);
+          
+          usageData = userUsage || [];
         }
       } catch (donationError) {
         // Erro esperado para usuários não administradores - silenciar
@@ -91,8 +113,18 @@ export const useDiaperData = () => {
         age_group_name: donation.diaper_age_groups?.name || 'N/A',
       }));
 
+      // Formatar dados de uso
+      const formattedUsage: UsageData[] = (usageData || []).map((usage: any) => ({
+        id: usage.id,
+        quantity: usage.quantity,
+        usage_date: usage.usage_date,
+        age_group_name: usage.diaper_age_groups?.name || 'N/A',
+        notes: usage.notes,
+      }));
+
       setAgeGroups(formattedAgeGroups);
       setDonations(formattedDonations);
+      setUsage(formattedUsage);
     } catch (error: any) {
       console.error('Erro ao buscar dados:', error);
       toast.error('Erro ao carregar dados do dashboard');
@@ -133,6 +165,7 @@ export const useDiaperData = () => {
 
     // SEGURANÇA: Realtime para doações apenas para usuários autenticados
     let donationsChannel: any = null;
+    let usageChannel: any = null;
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         donationsChannel = supabase
@@ -147,6 +180,19 @@ export const useDiaperData = () => {
             () => fetchData()
           )
           .subscribe();
+
+        usageChannel = supabase
+          .channel('usage-changes')
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'diaper_usage'
+            },
+            () => fetchData()
+          )
+          .subscribe();
       }
     });
 
@@ -155,6 +201,9 @@ export const useDiaperData = () => {
       supabase.removeChannel(stockChannel);
       if (donationsChannel) {
         supabase.removeChannel(donationsChannel);
+      }
+      if (usageChannel) {
+        supabase.removeChannel(usageChannel);
       }
     };
   }, []);
@@ -193,9 +242,39 @@ export const useDiaperData = () => {
     }));
   };
 
+  const getTotalUsage = () => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    return usage
+      .filter(u => new Date(u.usage_date) >= thirtyDaysAgo)
+      .reduce((acc, u) => acc + u.quantity, 0);
+  };
+
+  const getUsageByAgeGroup = () => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const recentUsage = usage.filter(u => new Date(u.usage_date) >= thirtyDaysAgo);
+    
+    return ageGroups.map(group => {
+      const groupUsage = recentUsage.filter(u => u.age_group_name === group.name);
+      const totalUsed = groupUsage.reduce((acc, u) => acc + u.quantity, 0);
+      
+      return {
+        id: group.id,
+        name: group.name,
+        totalUsed,
+        averageDaily: Math.round(totalUsed / 30),
+        color: group.color_theme
+      };
+    });
+  };
+
   return {
     ageGroups,
     donations,
+    usage,
     loading,
     getTotalStock,
     getTotalTarget,
@@ -203,6 +282,8 @@ export const useDiaperData = () => {
     getShoppingList,
     getLowStockAlerts,
     getMonthlyAverage,
+    getTotalUsage,
+    getUsageByAgeGroup,
     refetch: fetchData,
   };
 };
