@@ -26,6 +26,7 @@ export type Database = {
           parent1_name: string | null
           parent2_name: string | null
           updated_at: string
+          url_slug: string | null
           user_id: string
         }
         Insert: {
@@ -39,6 +40,7 @@ export type Database = {
           parent1_name?: string | null
           parent2_name?: string | null
           updated_at?: string
+          url_slug?: string | null
           user_id: string
         }
         Update: {
@@ -52,6 +54,7 @@ export type Database = {
           parent1_name?: string | null
           parent2_name?: string | null
           updated_at?: string
+          url_slug?: string | null
           user_id?: string
         }
         Relationships: []
@@ -313,9 +316,29 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      baby_profiles: {
+        Row: {
+          birth_date: string | null
+          birth_place: string | null
+          diaper_groups: Json | null
+          gender: string | null
+          is_born: boolean | null
+          name: string | null
+          parent1_name: string | null
+          parent2_name: string | null
+          subtitle: string | null
+          title: string | null
+          url_slug: string | null
+          welcome_message: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      generate_url_slug: {
+        Args: { input_name: string }
+        Returns: string
+      }
       get_donation_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
