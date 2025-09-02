@@ -15,6 +15,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { BabyInfoDisplay } from "@/components/BabyInfoDisplay";
+import { BabyUrlDisplay } from "@/components/BabyUrlDisplay";
 import { useDiaperData } from "@/hooks/useDiaperData";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -107,6 +108,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8">
         <DashboardHeader />
         <BabyInfoDisplay />
+        <BabyUrlDisplay />
         
         {/* Resumo Geral */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

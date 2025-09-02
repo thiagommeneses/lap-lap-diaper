@@ -339,6 +339,23 @@ export type Database = {
         Args: { input_name: string }
         Returns: string
       }
+      get_baby_profile_by_slug: {
+        Args: { baby_slug: string }
+        Returns: {
+          birth_date: string
+          birth_place: string
+          diaper_groups: Json
+          gender: string
+          is_born: boolean
+          name: string
+          parent1_name: string
+          parent2_name: string
+          subtitle: string
+          title: string
+          url_slug: string
+          welcome_message: string
+        }[]
+      }
       get_donation_stats: {
         Args: Record<PropertyKey, never>
         Returns: {

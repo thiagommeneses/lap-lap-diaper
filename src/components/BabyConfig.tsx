@@ -18,6 +18,7 @@ interface BabyInfo {
   birth_place: string;
   parent1_name: string;
   parent2_name: string;
+  url_slug?: string;
 }
 
 export const BabyConfig = () => {
@@ -29,7 +30,8 @@ export const BabyConfig = () => {
     gender: "não_informado",
     birth_place: "",
     parent1_name: "",
-    parent2_name: ""
+    parent2_name: "",
+    url_slug: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,7 +55,8 @@ export const BabyConfig = () => {
           birth_date: data.birth_date || "",
           birth_place: data.birth_place || "",
           parent1_name: data.parent1_name || "",
-          parent2_name: data.parent2_name || ""
+          parent2_name: data.parent2_name || "",
+          url_slug: data.url_slug || ""
         });
       }
     } catch (error: any) {
@@ -94,7 +97,8 @@ export const BabyConfig = () => {
         gender: babyInfo.gender,
         birth_place: babyInfo.birth_place || null,
         parent1_name: babyInfo.parent1_name || null,
-        parent2_name: babyInfo.parent2_name || null
+        parent2_name: babyInfo.parent2_name || null,
+        url_slug: babyInfo.url_slug || null
       };
 
       if (babyInfo.id) {
@@ -160,6 +164,24 @@ export const BabyConfig = () => {
                 />
               </div>
 
+              <div>
+                <Label htmlFor="url_slug">URL Personalizada</Label>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">meusite.com/</span>
+                  <Input
+                    id="url_slug"
+                    value={babyInfo.url_slug || ""}
+                    onChange={(e) => setBabyInfo({...babyInfo, url_slug: e.target.value})}
+                    placeholder="nome-do-bebe"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Deixe em branco para gerar automaticamente baseado no nome
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="gender">Sexo</Label>
                 <Select 
