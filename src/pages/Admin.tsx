@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Package, Gift, LogOut, User } from 'lucide-react';
+import { Settings, Package, Gift, LogOut, User, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Reports } from '@/components/Reports';
 
 interface AgeGroup {
   id: string;
@@ -230,8 +231,12 @@ const Admin = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="stock" className="w-full">
+        <Tabs defaultValue="reports" className="w-full">
           <TabsList className="mb-6">
+            <TabsTrigger value="reports" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Relatórios
+            </TabsTrigger>
             <TabsTrigger value="stock" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Controle de Estoque
@@ -245,6 +250,10 @@ const Admin = () => {
               Configurações
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="reports" className="space-y-6">
+            <Reports />
+          </TabsContent>
 
           <TabsContent value="stock" className="space-y-6">
             <Card className="card-baby p-6">
