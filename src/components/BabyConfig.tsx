@@ -75,17 +75,42 @@ export const BabyConfig = () => {
     setIsSubmitting(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Erro",
+          description: "Usuário não autenticado",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const updateData = {
+        name: babyInfo.name,
+        birth_date: babyInfo.birth_date || null,
+        is_born: babyInfo.is_born,
+        gender: babyInfo.gender,
+        birth_place: babyInfo.birth_place || null,
+        parent1_name: babyInfo.parent1_name || null,
+        parent2_name: babyInfo.parent2_name || null
+      };
+
       if (babyInfo.id) {
         const { error } = await supabase
           .from('baby_info')
-          .update(babyInfo)
+          .update(updateData)
           .eq('id', babyInfo.id);
         
         if (error) throw error;
       } else {
         const { data, error } = await supabase
           .from('baby_info')
-          .insert(babyInfo)
+          .insert({
+            ...updateData,
+            user_id: user.id
+          })
           .select()
           .single();
         
