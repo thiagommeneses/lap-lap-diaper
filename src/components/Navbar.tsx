@@ -10,7 +10,9 @@ import {
   Minus, 
   Type, 
   LogOut,
-  User
+  User,
+  Gift,
+  ShoppingCart
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,8 +48,8 @@ export const Navbar = () => {
     { name: "Dashboard", path: "/", icon: Baby },
     { name: "Admin", path: "/admin", icon: Settings },
     { name: "Consumir", path: "/usage", icon: Minus },
-    { name: "Config. Bebê", path: "/baby-settings", icon: User },
-    { name: "Config. Textos", path: "/page-settings", icon: Type }
+    { name: "Registrar Doação", path: "/register-donation", icon: Gift },
+    { name: "Registrar Compra", path: "/register-purchase", icon: ShoppingCart }
   ];
 
   const NavLink = ({ item, mobile = false }: { item: typeof navigationItems[0], mobile?: boolean }) => (

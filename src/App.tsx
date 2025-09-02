@@ -12,6 +12,8 @@ import Admin from "./pages/Admin";
 import Usage from "./pages/Usage";
 import BabySettings from "./pages/BabySettings";
 import PageSettings from "./pages/PageSettings";
+import RegisterDonation from "./pages/RegisterDonation";
+import RegisterPurchase from "./pages/RegisterPurchase";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +35,8 @@ const App = () => (
                 <Route path="/usage" element={<ProtectedRoute><Usage /></ProtectedRoute>} />
                 <Route path="/baby-settings" element={<ProtectedRoute><BabySettings /></ProtectedRoute>} />
                 <Route path="/page-settings" element={<ProtectedRoute><PageSettings /></ProtectedRoute>} />
+                <Route path="/register-donation" element={<ProtectedRoute><RegisterDonation /></ProtectedRoute>} />
+                <Route path="/register-purchase" element={<ProtectedRoute><RegisterPurchase /></ProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

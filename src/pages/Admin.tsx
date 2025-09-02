@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Package, Gift, User, BarChart3, ShoppingCart } from 'lucide-react';
+import { Settings, Package, Gift, User, BarChart3, ShoppingCart, Type } from 'lucide-react';
 import { toast } from 'sonner';
 import { Reports } from '@/components/Reports';
 
@@ -334,13 +334,13 @@ const Admin = () => {
               <Package className="w-4 h-4" />
               Controle de Estoque
             </TabsTrigger>
-            <TabsTrigger value="donations" className="flex items-center gap-2">
-              <Gift className="w-4 h-4" />
-              Registrar Doação
+            <TabsTrigger value="baby-config" className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Config. Bebê
             </TabsTrigger>
-            <TabsTrigger value="purchases" className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4" />
-              Registrar Compra
+            <TabsTrigger value="page-config" className="flex items-center gap-2">
+              <Type className="w-4 h-4" />
+              Config. Textos
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -431,183 +431,42 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="donations" className="space-y-6">
+
+          <TabsContent value="baby-config" className="space-y-6">
             <Card className="card-baby p-6">
               <h2 className="text-xl font-semibold font-heading text-foreground mb-4">
-                Registrar Nova Doação
+                Configuração do Bebê
               </h2>
-              <form onSubmit={handleDonation} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="age-group">Faixa Etária *</Label>
-                    <select
-                      id="age-group"
-                      className="w-full p-2 border border-border rounded-md bg-background text-foreground"
-                      value={donationForm.age_group_id}
-                      onChange={(e) => setDonationForm({ ...donationForm, age_group_id: e.target.value })}
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      {ageGroups.map((group) => (
-                        <option key={group.id} value={group.id}>
-                          {group.name} ({group.age_range})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="quantity">Quantidade *</Label>
-                    <Input
-                      id="quantity"
-                      type="number"
-                      value={donationForm.quantity}
-                      onChange={(e) => setDonationForm({ ...donationForm, quantity: parseInt(e.target.value) || 0 })}
-                      required
-                      min="1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="donor-name">Nome do Doador</Label>
-                    <Input
-                      id="donor-name"
-                      value={donationForm.donor_name}
-                      onChange={(e) => setDonationForm({ ...donationForm, donor_name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="donor-contact">Contato do Doador</Label>
-                    <Input
-                      id="donor-contact"
-                      value={donationForm.donor_contact}
-                      onChange={(e) => setDonationForm({ ...donationForm, donor_contact: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="notes">Observações</Label>
-                  <Textarea
-                    id="notes"
-                    placeholder="Ex: marca, condições especiais, etc."
-                    value={donationForm.notes}
-                    onChange={(e) => setDonationForm({ ...donationForm, notes: e.target.value })}
-                  />
-                </div>
-
-                <Button type="submit" className="btn-baby-mint">
-                  <Gift className="w-4 h-4 mr-2" />
-                  Registrar Doação
-                </Button>
-              </form>
+              <p className="text-muted-foreground mb-4">
+                Configure as informações do bebê como nome, data de nascimento e outros detalhes.
+              </p>
+              <Button
+                onClick={() => navigate('/baby-settings')}
+                className="btn-baby-blue"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Ir para Configuração do Bebê
+              </Button>
             </Card>
           </TabsContent>
 
-          <TabsContent value="purchases" className="space-y-6">
+          <TabsContent value="page-config" className="space-y-6">
             <Card className="card-baby p-6">
               <h2 className="text-xl font-semibold font-heading text-foreground mb-4">
-                Registrar Nova Compra
+                Configuração de Textos
               </h2>
-              <form onSubmit={handlePurchase} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="purchase-age-group">Faixa Etária *</Label>
-                    <select
-                      id="purchase-age-group"
-                      className="w-full p-2 border border-border rounded-md bg-background text-foreground"
-                      value={purchaseForm.age_group_id}
-                      onChange={(e) => setPurchaseForm({ ...purchaseForm, age_group_id: e.target.value })}
-                      required
-                    >
-                      <option value="">Selecione...</option>
-                      {ageGroups.map((group) => (
-                        <option key={group.id} value={group.id}>
-                          {group.name} ({group.age_range})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="purchase-quantity">Quantidade *</Label>
-                    <Input
-                      id="purchase-quantity"
-                      type="number"
-                      value={purchaseForm.quantity}
-                      onChange={(e) => {
-                        const qty = parseInt(e.target.value) || 0;
-                        setPurchaseForm({ 
-                          ...purchaseForm, 
-                          quantity: qty,
-                          total_cost: qty * purchaseForm.unit_price
-                        });
-                      }}
-                      required
-                      min="1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="unit-price">Preço Unitário (R$)</Label>
-                    <Input
-                      id="unit-price"
-                      type="number"
-                      step="0.01"
-                      value={purchaseForm.unit_price}
-                      onChange={(e) => {
-                        const price = parseFloat(e.target.value) || 0;
-                        setPurchaseForm({ 
-                          ...purchaseForm, 
-                          unit_price: price,
-                          total_cost: purchaseForm.quantity * price
-                        });
-                      }}
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="total-cost">Total (R$)</Label>
-                    <Input
-                      id="total-cost"
-                      type="number"
-                      step="0.01"
-                      value={purchaseForm.total_cost}
-                      onChange={(e) => setPurchaseForm({ ...purchaseForm, total_cost: parseFloat(e.target.value) || 0 })}
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="store-name">Loja/Fornecedor</Label>
-                    <Input
-                      id="store-name"
-                      value={purchaseForm.store_name}
-                      onChange={(e) => setPurchaseForm({ ...purchaseForm, store_name: e.target.value })}
-                      placeholder="Ex: Farmácia ABC"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="purchase-notes">Observações</Label>
-                  <Textarea
-                    id="purchase-notes"
-                    placeholder="Ex: marca, desconto aplicado, etc."
-                    value={purchaseForm.notes}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, notes: e.target.value })}
-                  />
-                </div>
-
-                <Button type="submit" className="btn-baby-blue">
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Registrar Compra
-                </Button>
-              </form>
+              <p className="text-muted-foreground mb-4">
+                Personalize os textos e mensagens exibidos no sistema.
+              </p>
+              <Button
+                onClick={() => navigate('/page-settings')}
+                className="btn-baby-mint"
+              >
+                <Type className="w-4 h-4 mr-2" />
+                Ir para Configuração de Textos
+              </Button>
             </Card>
           </TabsContent>
-
           <TabsContent value="settings" className="space-y-6">
             <Card className="card-baby p-6">
               <h2 className="text-xl font-semibold font-heading text-foreground mb-4">
