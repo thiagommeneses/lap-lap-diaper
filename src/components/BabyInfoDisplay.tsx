@@ -27,7 +27,7 @@ export const BabyInfoDisplay = () => {
         .from('baby_info')
         .select('*')
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       
