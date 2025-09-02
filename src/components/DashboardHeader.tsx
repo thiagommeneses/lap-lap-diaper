@@ -1,10 +1,24 @@
 import { Baby, Settings, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { usePageSettings } from "@/hooks/usePageSettings";
 import heroImage from "@/assets/baby-hero.jpg";
 
 export const DashboardHeader = () => {
   const navigate = useNavigate();
+  const { settings, loading } = usePageSettings();
+  
+  if (loading) {
+    return (
+      <div className="relative overflow-hidden rounded-3xl mb-8">
+        <div className="bg-gradient-soft p-8 md:p-12 text-center animate-pulse">
+          <div className="h-16 bg-baby-blue/20 rounded-full w-16 mx-auto mb-4"></div>
+          <div className="h-8 bg-baby-blue/20 rounded mb-4 max-w-md mx-auto"></div>
+          <div className="h-4 bg-baby-blue/20 rounded mb-6 max-w-lg mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="relative overflow-hidden rounded-3xl mb-8">
@@ -24,12 +38,20 @@ export const DashboardHeader = () => {
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-4">
-            Lap Lap Diaper
+            {settings.title}
           </h1>
           
           <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Acompanhe o estoque e o consumo de fraldas do seu bebê de forma simples e organizada
+            {settings.subtitle}
           </p>
+
+          {settings.welcome_message && (
+            <div className="mb-4">
+              <p className="text-sm text-baby-blue font-medium bg-baby-blue/10 px-4 py-2 rounded-full inline-block">
+                {settings.welcome_message}
+              </p>
+            </div>
+          )}
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button className="btn-baby-pink" onClick={() => navigate('/admin')}>
@@ -44,10 +66,17 @@ export const DashboardHeader = () => {
             </Button>
             <Button 
               className="btn-baby-blue" 
-              onClick={() => navigate('/baby-settings')}
+              onClick={() => navigate("/baby-settings")}
             >
               <Baby className="w-4 h-4 mr-2" />
               Config. Bebê
+            </Button>
+            <Button 
+              className="btn-baby-purple" 
+              onClick={() => navigate("/page-settings")}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Config. Textos
             </Button>
             <Button 
               variant="outline" 

@@ -242,6 +242,33 @@ export type Database = {
         }
         Relationships: []
       }
+      page_settings: {
+        Row: {
+          created_at: string
+          id: string
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+          welcome_message: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+          welcome_message?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+          welcome_message?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null

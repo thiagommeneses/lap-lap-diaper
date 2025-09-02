@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import Usage from "./pages/Usage";
 import BabySettings from "./pages/BabySettings";
+import PageSettings from "./pages/PageSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/usage" element={<Usage />} />
             <Route path="/baby-settings" element={<BabySettings />} />
+            <Route path="/page-settings" element={<PageSettings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

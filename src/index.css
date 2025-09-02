@@ -163,6 +163,10 @@
     @apply bg-gradient-to-r from-[hsl(var(--baby-orange))] to-[hsl(var(--baby-orange-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
   }
 
+  .btn-baby-purple {
+    @apply bg-gradient-to-r from-[hsl(var(--baby-purple))] to-[hsl(var(--baby-purple-dark))] text-foreground rounded-[var(--radius)] px-6 py-3 font-medium transition-[var(--transition-bounce)] hover:scale-105 shadow-[var(--shadow-soft)];
+  }
+
   .progress-bar {
     @apply h-4 rounded-full overflow-hidden bg-muted;
   }
