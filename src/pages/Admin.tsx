@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { Settings, Package, Gift, LogOut, User, BarChart3, ShoppingCart } from 'lucide-react';
+import { Settings, Package, Gift, User, BarChart3, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { Reports } from '@/components/Reports';
 
@@ -48,7 +48,7 @@ interface PurchaseForm {
 }
 
 const Admin = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [ageGroups, setAgeGroups] = useState<AgeGroup[]>([]);
   const [stocks, setStocks] = useState<Stock[]>([]);
@@ -295,12 +295,6 @@ const Admin = () => {
     }));
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-    toast.success('Logout realizado com sucesso!');
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -313,7 +307,7 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -326,13 +320,6 @@ const Admin = () => {
               <User className="w-4 h-4 mr-1" />
               {user?.email}
             </Badge>
-            <Button variant="outline" onClick={() => navigate('/')}>
-              ← Dashboard
-            </Button>
-            <Button variant="outline" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Sair
-            </Button>
           </div>
         </div>
 

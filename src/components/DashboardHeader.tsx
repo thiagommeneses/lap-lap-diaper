@@ -1,11 +1,8 @@
-import { Baby, Settings, Package } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Baby } from "lucide-react";
 import { usePageSettings } from "@/hooks/usePageSettings";
 import heroImage from "@/assets/baby-hero.jpg";
 
 export const DashboardHeader = () => {
-  const navigate = useNavigate();
   const { settings, loading } = usePageSettings();
   
   if (loading) {
@@ -46,47 +43,12 @@ export const DashboardHeader = () => {
           </p>
 
           {settings.welcome_message && (
-            <div className="mb-4">
+            <div className="mb-6">
               <p className="text-sm text-baby-blue font-medium bg-baby-blue/10 px-4 py-2 rounded-full inline-block">
                 {settings.welcome_message}
               </p>
             </div>
           )}
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="btn-baby-pink" onClick={() => navigate('/admin')}>
-              Administração
-            </Button>
-            <Button 
-              className="btn-baby-mint" 
-              onClick={() => navigate('/usage')}
-            >
-              <Package className="w-4 h-4 mr-2" />
-              Consumir Estoque
-            </Button>
-            <Button 
-              className="btn-baby-blue" 
-              onClick={() => navigate("/baby-settings")}
-            >
-              <Baby className="w-4 h-4 mr-2" />
-              Config. Bebê
-            </Button>
-            <Button 
-              className="btn-baby-purple" 
-              onClick={() => navigate("/page-settings")}
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Config. Textos
-            </Button>
-            <Button 
-              variant="outline" 
-              className="bg-baby-white/80 border-border hover:bg-baby-white"
-              onClick={() => navigate('/auth')}
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Login
-            </Button>
-          </div>
         </div>
       </div>
     </div>
