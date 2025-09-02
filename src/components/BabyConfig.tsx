@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Baby, Heart } from "lucide-react";
+import { Baby, Heart, Check, X, Loader2, Lightbulb } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUrlSlugValidation } from "@/hooks/useUrlSlugValidation";
 
 interface BabyInfo {
   id?: string;
@@ -34,6 +35,32 @@ export const BabyConfig = () => {
     url_slug: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // URL validation hook
+  const { validationResult, validateSlug } = useUrlSlugValidation(babyInfo.name, babyInfo.url_slug);
+
+  // Debounced URL validation
+  useEffect(() => {
+    if (babyInfo.url_slug) {
+      const timeoutId = setTimeout(() => {
+        validateSlug(babyInfo.url_slug);
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [babyInfo.url_slug, validateSlug]);
+
+  // Auto-fill suggestion when name changes and url_slug is empty
+  useEffect(() => {
+    if (babyInfo.name && !babyInfo.url_slug && validationResult.suggestion) {
+      setBabyInfo(prev => ({ ...prev, url_slug: validationResult.suggestion }));
+    }
+  }, [validationResult.suggestion, babyInfo.name, babyInfo.url_slug]);
+
+  const handleUseSuggestion = useCallback(() => {
+    if (validationResult.suggestion) {
+      setBabyInfo(prev => ({ ...prev, url_slug: validationResult.suggestion }));
+    }
+  }, [validationResult.suggestion]);
 
   useEffect(() => {
     loadBabyInfo();
@@ -166,18 +193,83 @@ export const BabyConfig = () => {
 
               <div>
                 <Label htmlFor="url_slug">URL Personalizada</Label>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">meusite.com/</span>
-                  <Input
-                    id="url_slug"
-                    value={babyInfo.url_slug || ""}
-                    onChange={(e) => setBabyInfo({...babyInfo, url_slug: e.target.value})}
-                    placeholder="nome-do-bebe"
-                  />
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">meusite.com/</span>
+                    <div className="relative flex-1">
+                      <Input
+                        id="url_slug"
+                        value={babyInfo.url_slug || ""}
+                        onChange={(e) => setBabyInfo({...babyInfo, url_slug: e.target.value})}
+                        placeholder="nome-do-bebe"
+                        className={`pr-8 ${
+                          babyInfo.url_slug && validationResult.isAvailable === true 
+                            ? 'border-green-500 focus-visible:ring-green-500' 
+                            : babyInfo.url_slug && validationResult.isAvailable === false 
+                            ? 'border-red-500 focus-visible:ring-red-500' 
+                            : ''
+                        }`}
+                      />
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        {validationResult.isChecking ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                        ) : babyInfo.url_slug && validationResult.isAvailable === true ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : babyInfo.url_slug && validationResult.isAvailable === false ? (
+                          <X className="w-4 h-4 text-red-500" />
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Availability status */}
+                  {babyInfo.url_slug && !validationResult.isChecking && (
+                    <div className="text-xs">
+                      {validationResult.isAvailable === true ? (
+                        <span className="text-green-600 flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          URL disponível
+                        </span>
+                      ) : validationResult.isAvailable === false ? (
+                        <span className="text-red-600 flex items-center gap-1">
+                          <X className="w-3 h-3" />
+                          URL já está em uso
+                        </span>
+                      ) : null}
+                    </div>
+                  )}
+
+                  {/* Suggestion */}
+                  {validationResult.suggestion && 
+                   validationResult.suggestion !== babyInfo.url_slug && 
+                   validationResult.isAvailable === false && (
+                    <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-md">
+                      <Lightbulb className="w-4 h-4 text-blue-500" />
+                      <span className="text-xs text-blue-700 dark:text-blue-300">
+                        Sugestão: 
+                      </span>
+                      <code className="text-xs bg-blue-100 dark:bg-blue-900/40 px-1 py-0.5 rounded">
+                        {validationResult.suggestion}
+                      </code>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleUseSuggestion}
+                        className="h-6 px-2 text-xs"
+                      >
+                        Usar
+                      </Button>
+                    </div>
+                  )}
+
+                  <p className="text-xs text-muted-foreground">
+                    {babyInfo.name ? 
+                      'URL será gerada automaticamente baseada no nome se deixar em branco' :
+                      'Digite o nome do bebê para gerar uma sugestão de URL'
+                    }
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Deixe em branco para gerar automaticamente baseado no nome
-                </p>
               </div>
             </div>
 
