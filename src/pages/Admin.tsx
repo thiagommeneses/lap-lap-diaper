@@ -43,6 +43,7 @@ const Admin = () => {
   const [ageGroups, setAgeGroups] = useState<AgeGroup[]>([]);
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingAgeGroups, setEditingAgeGroups] = useState<{[key: string]: AgeGroup}>({});
   const [donationForm, setDonationForm] = useState<DonationForm>({
     age_group_id: '',
     quantity: 0,
@@ -137,6 +138,55 @@ const Admin = () => {
     } catch (error: any) {
       toast.error('Erro ao registrar doação: ' + error.message);
     }
+  };
+
+  const handleUpdateAgeGroup = async (ageGroupId: string, updatedData: Partial<AgeGroup>) => {
+    try {
+      const { error } = await supabase
+        .from('diaper_age_groups')
+        .update(updatedData)
+        .eq('id', ageGroupId);
+
+      if (error) throw error;
+
+      toast.success('Configuração atualizada com sucesso!');
+      
+      // Remove from editing state
+      setEditingAgeGroups(prev => {
+        const newState = { ...prev };
+        delete newState[ageGroupId];
+        return newState;
+      });
+      
+      fetchData();
+    } catch (error: any) {
+      toast.error('Erro ao atualizar configuração: ' + error.message);
+    }
+  };
+
+  const startEditing = (ageGroup: AgeGroup) => {
+    setEditingAgeGroups(prev => ({
+      ...prev,
+      [ageGroup.id]: { ...ageGroup }
+    }));
+  };
+
+  const cancelEditing = (ageGroupId: string) => {
+    setEditingAgeGroups(prev => {
+      const newState = { ...prev };
+      delete newState[ageGroupId];
+      return newState;
+    });
+  };
+
+  const updateEditingAgeGroup = (ageGroupId: string, field: keyof AgeGroup, value: string | number) => {
+    setEditingAgeGroups(prev => ({
+      ...prev,
+      [ageGroupId]: {
+        ...prev[ageGroupId],
+        [field]: value
+      }
+    }));
   };
 
   const handleSignOut = async () => {
@@ -313,33 +363,92 @@ const Admin = () => {
                 Configurações das Faixas Etárias
               </h2>
               <div className="space-y-4">
-                {ageGroups.map((group) => (
-                  <div key={group.id} className="border border-border rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      <div>
-                        <Label>Nome</Label>
-                        <Input value={group.name} readOnly />
+                {ageGroups.map((group) => {
+                  const isEditing = editingAgeGroups[group.id];
+                  const currentData = isEditing || group;
+                  
+                  return (
+                    <div key={group.id} className="border border-border rounded-lg p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <Label>Nome</Label>
+                          <Input 
+                            value={currentData.name} 
+                            readOnly={!isEditing}
+                            onChange={(e) => isEditing && updateEditingAgeGroup(group.id, 'name', e.target.value)}
+                            className={isEditing ? 'border-primary' : ''}
+                          />
+                        </div>
+                        <div>
+                          <Label>Faixa Etária</Label>
+                          <Input 
+                            value={currentData.age_range} 
+                            readOnly={!isEditing}
+                            onChange={(e) => isEditing && updateEditingAgeGroup(group.id, 'age_range', e.target.value)}
+                            className={isEditing ? 'border-primary' : ''}
+                          />
+                        </div>
+                        <div>
+                          <Label>Meta Estimada</Label>
+                          <Input 
+                            type="number" 
+                            value={currentData.estimated_quantity} 
+                            readOnly={!isEditing}
+                            onChange={(e) => isEditing && updateEditingAgeGroup(group.id, 'estimated_quantity', parseInt(e.target.value) || 0)}
+                            className={isEditing ? 'border-primary' : ''}
+                          />
+                        </div>
+                        <div>
+                          <Label>Preço Unitário (R$)</Label>
+                          <Input 
+                            type="number" 
+                            step="0.01"
+                            value={currentData.price_per_unit} 
+                            readOnly={!isEditing}
+                            onChange={(e) => isEditing && updateEditingAgeGroup(group.id, 'price_per_unit', parseFloat(e.target.value) || 0)}
+                            className={isEditing ? 'border-primary' : ''}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label>Faixa Etária</Label>
-                        <Input value={group.age_range} readOnly />
-                      </div>
-                      <div>
-                        <Label>Meta Estimada</Label>
-                        <Input type="number" value={group.estimated_quantity} readOnly />
-                      </div>
-                      <div>
-                        <Label>Preço Unitário</Label>
-                        <Input 
-                          type="number" 
-                          step="0.01"
-                          value={group.price_per_unit} 
-                          readOnly 
-                        />
+                      
+                      <div className="flex gap-2 justify-end">
+                        {!isEditing ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => startEditing(group)}
+                            className="btn-baby-blue"
+                          >
+                            <Settings className="w-4 h-4 mr-2" />
+                            Editar
+                          </Button>
+                        ) : (
+                          <>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => cancelEditing(group.id)}
+                            >
+                              Cancelar
+                            </Button>
+                            <Button 
+                              size="sm"
+                              onClick={() => handleUpdateAgeGroup(group.id, {
+                                name: currentData.name,
+                                age_range: currentData.age_range,
+                                estimated_quantity: currentData.estimated_quantity,
+                                price_per_unit: currentData.price_per_unit
+                              })}
+                              className="btn-baby-green"
+                            >
+                              Salvar
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Card>
           </TabsContent>
