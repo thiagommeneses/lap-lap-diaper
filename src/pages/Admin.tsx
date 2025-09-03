@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Settings, Package, Gift, User, BarChart3, ShoppingCart, Type, Crown, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Reports } from '@/components/Reports';
+import { PendingDonations } from '@/components/PendingDonations';
 
 interface AgeGroup {
   id: string;
@@ -191,7 +192,7 @@ const Admin = () => {
 
       if (error) throw error;
 
-      toast.success('Doação registrada com sucesso! Estoque atualizado automaticamente.');
+      toast.success('Doação registrada com sucesso! Aguardando aprovação para atualizar o estoque.');
       setDonationForm({
         age_group_id: '',
         quantity: 0,
@@ -374,6 +375,7 @@ const Admin = () => {
 
           <TabsContent value="reports" className="space-y-6">
             <Reports />
+            <PendingDonations />
           </TabsContent>
 
           <TabsContent value="stock" className="space-y-6">

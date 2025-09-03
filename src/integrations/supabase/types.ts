@@ -110,6 +110,7 @@ export type Database = {
           id: string
           notes: string | null
           quantity: number
+          status: string
         }
         Insert: {
           age_group_id?: string | null
@@ -122,6 +123,7 @@ export type Database = {
           id?: string
           notes?: string | null
           quantity: number
+          status?: string
         }
         Update: {
           age_group_id?: string | null
@@ -134,6 +136,7 @@ export type Database = {
           id?: string
           notes?: string | null
           quantity?: number
+          status?: string
         }
         Relationships: [
           {
@@ -325,6 +328,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_donation: {
+        Args: { donation_id: string }
+        Returns: undefined
+      }
       create_user_admin: {
         Args: {
           make_admin?: boolean
@@ -402,6 +409,10 @@ export type Database = {
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      reject_donation: {
+        Args: { donation_id: string }
+        Returns: undefined
       }
       update_user_admin_status: {
         Args: { new_admin_status: boolean; target_user_id: string }
