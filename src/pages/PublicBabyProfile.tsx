@@ -194,20 +194,30 @@ const PublicBabyProfile = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold font-heading text-foreground mb-2">
-            {profile.title}
-          </h1>
-          <p className="text-lg text-muted-foreground mb-4">
-            {profile.subtitle}
-          </p>
-          <p className="text-muted-foreground">
-            {profile.welcome_message}
-          </p>
+      {/* Hero Section */}
+      <div className="hero-baby py-20 min-h-[60vh] flex items-center justify-center">
+        <div className="hero-content container mx-auto px-4 text-center">
+          <div className="max-w-4xl mx-auto">
+            {/* Baby Icon */}
+            <div className="bg-gradient-baby-blue p-6 rounded-full w-24 h-24 mx-auto mb-8 flex items-center justify-center shadow-[var(--shadow-card)] animate-bounce-gentle">
+              <Baby className="w-12 h-12 text-foreground" />
+            </div>
+            
+            {/* Welcome Text */}
+            <h1 className="text-5xl md:text-6xl font-bold font-heading text-foreground mb-4">
+              Sejam bem-vindos
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-6 max-w-3xl mx-auto">
+              {profile.subtitle}
+            </p>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              {profile.welcome_message}
+            </p>
+          </div>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8">
         {/* Baby Info */}
         <Card className="card-baby p-6 mb-8">
           <div className="text-center mb-6">
