@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSuperAdmin } from '@/hooks/useSuperAdmin';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,6 +56,7 @@ const Admin = () => {
   const { user } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
   const navigate = useNavigate();
+  const location = useLocation();
   const [ageGroups, setAgeGroups] = useState<AgeGroup[]>([]);
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -351,7 +352,7 @@ const Admin = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="reports" className="w-full">
+        <Tabs defaultValue={location.hash === '#reminders' ? 'reminders' : 'reports'} className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="reports" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { 
   Baby, 
@@ -13,20 +14,27 @@ import {
   User,
   Gift,
   ShoppingCart,
-  Crown
+  Crown,
+  Bell
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+import { useReminders } from "@/hooks/useReminders";
 
 export const Navbar = () => {
   const { user, session } = useAuth();
   const { isSuperAdmin } = useSuperAdmin();
+  const { unreadCount } = useReminders();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleNotificationClick = () => {
+    navigate("/admin#reminders");
+  };
 
   const handleLogout = async () => {
     try {
@@ -107,6 +115,24 @@ export const Navbar = () => {
                   ))}
                 </div>
                 
+                {/* Notification Bell */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNotificationClick}
+                  className="relative p-2"
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 text-xs min-w-[1.25rem] h-5 rounded-full flex items-center justify-center p-0"
+                    >
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+                
                 <div className="flex items-center gap-2 border-l border-border pl-4">
                   <span className="text-sm text-muted-foreground">
                     {user.email}
@@ -161,6 +187,27 @@ export const Navbar = () => {
                       {allNavigationItems.map((item) => (
                         <NavLink key={item.path} item={item} mobile />
                       ))}
+                      
+                      {/* Mobile Notification Button */}
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          handleNotificationClick();
+                          setIsOpen(false);
+                        }}
+                        className="justify-start gap-2 relative"
+                      >
+                        <Bell className="w-4 h-4" />
+                        Notificações
+                        {unreadCount > 0 && (
+                          <Badge 
+                            variant="destructive" 
+                            className="text-xs"
+                          >
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                          </Badge>
+                        )}
+                      </Button>
                     </div>
 
                     <div className="pt-4 border-t border-border">
