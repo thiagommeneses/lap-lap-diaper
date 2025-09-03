@@ -378,6 +378,10 @@ export type Database = {
           total_quantity: number
         }[]
       }
+      get_user_detailed_stats: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       get_user_management_data: {
         Args: Record<PropertyKey, never>
         Returns: {

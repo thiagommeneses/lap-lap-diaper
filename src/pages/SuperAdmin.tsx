@@ -6,12 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, Users, Settings, Crown, UserCheck, UserX, Edit, Trash2, UserPlus } from 'lucide-react';
+import { Shield, Users, Settings, Crown, UserCheck, UserX, Edit, Trash2, UserPlus, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { EditUserModal } from '@/components/EditUserModal';
 import { AddUserModal } from '@/components/AddUserModal';
+import { UserDetailsModal } from '@/components/UserDetailsModal';
 
 interface UserData {
   id: string;
@@ -32,6 +33,7 @@ const SuperAdmin = () => {
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [showAddUser, setShowAddUser] = useState(false);
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [viewingUserId, setViewingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -242,6 +244,15 @@ const SuperAdmin = () => {
                         <Button
                           size="sm"
                           variant="outline"
+                          onClick={() => setViewingUserId(userData.id)}
+                          title="Ver detalhes"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        
+                        <Button
+                          size="sm"
+                          variant="outline"
                           onClick={() => setEditingUser(userData)}
                         >
                           <Edit className="w-4 h-4" />
@@ -321,6 +332,12 @@ const SuperAdmin = () => {
         isOpen={showAddUser}
         onClose={() => setShowAddUser(false)}
         onSuccess={fetchUsers}
+      />
+      
+      <UserDetailsModal
+        userId={viewingUserId}
+        isOpen={!!viewingUserId}
+        onClose={() => setViewingUserId(null)}
       />
     </div>
   );
