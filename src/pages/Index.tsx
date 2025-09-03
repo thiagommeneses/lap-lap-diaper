@@ -203,7 +203,7 @@ const Index = () => {
               ) : (
                 lowStockAlerts.map((alert) => (
                   <div key={alert.id} className="flex items-center justify-between p-3 bg-baby-yellow/20 rounded-lg">
-                    <span className="text-foreground">{alert.name} - Estoque Baixo</span>
+                    <span style="color:tomato;" className="text-foreground">{alert.name} - Estoque Baixo</span>
                     <Badge variant="secondary" className="bg-baby-yellow text-foreground">
                       Atenção
                     </Badge>
@@ -215,7 +215,7 @@ const Index = () => {
           
           <Card className="card-baby p-6">
             <h3 className="text-lg font-semibold font-heading text-foreground mb-4">
-              Lista de Compras Sugerida
+              Lista de Compras (Total Sugerida)
             </h3>
             <div className="space-y-3">
               {shoppingList.length === 0 ? (
@@ -230,7 +230,7 @@ const Index = () => {
                   ))}
                   <div className="pt-2">
                     <div className="text-sm text-muted-foreground">
-                      Estimativa total: <span className="font-medium text-foreground">
+                      Estimativa total (até o desfralde): <span className="font-medium text-foreground">
                         R$ {shoppingList.reduce((acc, item) => acc + item.estimatedCost, 0).toFixed(2)}
                       </span>
                     </div>
