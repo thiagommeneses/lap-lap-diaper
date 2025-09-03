@@ -17,6 +17,7 @@ import PageSettings from "./pages/PageSettings";
 import RegisterDonation from "./pages/RegisterDonation";
 import RegisterPurchase from "./pages/RegisterPurchase";
 import PublicBabyProfile from "./pages/PublicBabyProfile";
+import PublicDonation from "./pages/PublicDonation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,8 @@ const AppContent = () => (
         <Route path="/page-settings" element={<ProtectedRoute><PageSettings /></ProtectedRoute>} />
         <Route path="/register-donation" element={<ProtectedRoute><RegisterDonation /></ProtectedRoute>} />
         <Route path="/register-purchase" element={<ProtectedRoute><RegisterPurchase /></ProtectedRoute>} />
+        {/* Public donation route */}
+        <Route path="/doar/:slug" element={<PublicDonation />} />
         {/* Public baby profile route */}
         <Route path="/:slug" element={<PublicBabyProfile />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -1,9 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Copy, ExternalLink, Share2 } from "lucide-react";
+import { Copy, ExternalLink, Share2, QrCode } from "lucide-react";
 import { useBabyUrl } from "@/hooks/useBabyUrl";
 import { toast } from 'sonner';
+import QRCodeGenerator from './QRCodeGenerator';
 
 export const BabyUrlDisplay = () => {
   const { babyUrl, loading } = useBabyUrl();
@@ -46,45 +47,50 @@ export const BabyUrlDisplay = () => {
   };
 
   return (
-    <Card className="card-baby p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <h3 className="font-semibold text-foreground">URL Personalizada</h3>
-          <p className="text-sm text-muted-foreground">
-            Compartilhe com familiares e doadores
+    <div className="space-y-6">
+      <Card className="card-baby p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="font-semibold text-foreground">URL Personalizada</h3>
+            <p className="text-sm text-muted-foreground">
+              Compartilhe com familiares e doadores
+            </p>
+          </div>
+          <Badge variant="secondary" className="bg-baby-mint/20 text-foreground">
+            {babyUrl.baby_name}
+          </Badge>
+        </div>
+        
+        <div className="bg-background/50 p-3 rounded-lg mb-4">
+          <p className="text-sm font-mono text-foreground break-all">
+            {babyUrl.full_url}
           </p>
         </div>
-        <Badge variant="secondary" className="bg-baby-mint/20 text-foreground">
-          {babyUrl.baby_name}
-        </Badge>
-      </div>
+        
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={copyToClipboard}
+            className="flex-1"
+          >
+            <Copy className="w-4 h-4 mr-2" />
+            Copiar
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={openInNewTab}
+            className="flex-1"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Abrir
+          </Button>
+        </div>
+      </Card>
       
-      <div className="bg-background/50 p-3 rounded-lg mb-4">
-        <p className="text-sm font-mono text-foreground break-all">
-          {babyUrl.full_url}
-        </p>
-      </div>
-      
-      <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={copyToClipboard}
-          className="flex-1"
-        >
-          <Copy className="w-4 h-4 mr-2" />
-          Copiar
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={openInNewTab}
-          className="flex-1"
-        >
-          <ExternalLink className="w-4 h-4 mr-2" />
-          Abrir
-        </Button>
-      </div>
-    </Card>
+      {/* QR Code Generator */}
+      <QRCodeGenerator babySlug={babyUrl.url_slug!} babyName={babyUrl.baby_name!} />
+    </div>
   );
 };

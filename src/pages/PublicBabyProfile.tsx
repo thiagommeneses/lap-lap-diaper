@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Baby, 
   Heart, 
@@ -13,13 +13,16 @@ import {
   Gift,
   Trophy,
   Clock,
-  TrendingUp
+  TrendingUp,
+  QrCode
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from 'sonner';
+import QRCodeGenerator from "@/components/QRCodeGenerator";
 
 interface DiaperGroup {
   name: string;
@@ -76,6 +79,7 @@ const iconMap = {
 
 const PublicBabyProfile = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<BabyProfile | null>(null);
   const [donationData, setDonationData] = useState<DonationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -332,6 +336,26 @@ const PublicBabyProfile = () => {
             <span>Meta: {totalTarget} fraldas</span>
           </div>
         </Card>
+
+        {/* Quick Donation Button */}
+        <div className="text-center mb-8">
+          <Button
+            onClick={() => navigate(`/doar/${slug}`)}
+            size="lg"
+            className="btn-baby-mint text-lg px-8 py-4 gap-3"
+          >
+            <Heart className="w-6 h-6" />
+            Fazer uma Doação
+          </Button>
+          <p className="text-sm text-muted-foreground mt-2">
+            Ajude {profile.name} com sua generosidade
+          </p>
+        </div>
+
+        {/* QR Code for Donations */}
+        <div className="mb-8">
+          <QRCodeGenerator babySlug={profile.url_slug} babyName={profile.name} />
+        </div>
 
         {/* Donation Stats */}
         {donationData && (
