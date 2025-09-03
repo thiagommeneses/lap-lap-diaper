@@ -203,7 +203,7 @@ const Index = () => {
               ) : (
                 lowStockAlerts.map((alert) => (
                   <div key={alert.id} className="flex items-center justify-between p-3 bg-baby-yellow/20 rounded-lg">
-                    <span style="color:tomato;" className="text-foreground">{alert.name} - Estoque Baixo</span>
+                    <span style={{color: "tomato"}} className="text-foreground">{alert.name} - Estoque Baixo</span>
                     <Badge variant="secondary" className="bg-baby-yellow text-foreground">
                       Atenção
                     </Badge>
