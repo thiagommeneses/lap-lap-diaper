@@ -323,6 +323,51 @@ export type Database = {
         }
         Relationships: []
       }
+      reminders: {
+        Row: {
+          age_group_id: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          is_read: boolean
+          message: string
+          reminder_type: string
+          threshold_quantity: number | null
+          title: string
+          triggered_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_group_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_read?: boolean
+          message: string
+          reminder_type: string
+          threshold_quantity?: number | null
+          title: string
+          triggered_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_group_id?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_read?: boolean
+          message?: string
+          reminder_type?: string
+          threshold_quantity?: number | null
+          title?: string
+          triggered_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -330,6 +375,10 @@ export type Database = {
     Functions: {
       approve_donation: {
         Args: { donation_id: string }
+        Returns: undefined
+      }
+      check_stock_reminders: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       create_user_admin: {
@@ -400,6 +449,21 @@ export type Database = {
           id: string
           is_admin: boolean
           super_admin: boolean
+        }[]
+      }
+      get_user_reminders: {
+        Args: { target_user_id: string }
+        Returns: {
+          age_group_name: string
+          created_at: string
+          current_stock: number
+          id: string
+          is_read: boolean
+          message: string
+          reminder_type: string
+          threshold_quantity: number
+          title: string
+          triggered_at: string
         }[]
       }
       is_current_user_admin: {

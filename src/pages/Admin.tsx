@@ -15,6 +15,8 @@ import { Settings, Package, Gift, User, BarChart3, ShoppingCart, Type, Crown, Ar
 import { toast } from 'sonner';
 import { Reports } from '@/components/Reports';
 import { PendingDonations } from '@/components/PendingDonations';
+import RemindersPanel from '@/components/RemindersPanel';
+import ReminderSettings from '@/components/ReminderSettings';
 
 interface AgeGroup {
   id: string;
@@ -359,6 +361,10 @@ const Admin = () => {
               <Package className="w-4 h-4" />
               Controle de Estoque
             </TabsTrigger>
+            <TabsTrigger value="reminders" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Lembretes
+            </TabsTrigger>
             <TabsTrigger value="baby-config" className="flex items-center gap-2">
               <User className="w-4 h-4" />
               Config. Bebê
@@ -455,6 +461,13 @@ const Admin = () => {
                 })}
               </div>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="reminders" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <RemindersPanel />
+              <ReminderSettings />
+            </div>
           </TabsContent>
 
 
