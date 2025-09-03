@@ -22,19 +22,30 @@ export const useReminders = () => {
   const { user } = useAuth();
 
   const fetchReminders = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found in useReminders');
+      return;
+    }
 
     try {
       setLoading(true);
+      console.log('Fetching reminders for user:', user.id);
+      
       const { data, error } = await supabase.rpc('get_user_reminders', {
         target_user_id: user.id
       });
 
+      console.log('RPC response:', { data, error });
+
       if (error) throw error;
-      setReminders((data || []).map((item: any) => ({
+      
+      const processedData = (data || []).map((item: any) => ({
         ...item,
         reminder_type: item.reminder_type as 'low_stock' | 'restock' | 'donation_check'
-      })));
+      }));
+      
+      console.log('Processed reminders:', processedData);
+      setReminders(processedData);
     } catch (error) {
       console.error('Error fetching reminders:', error);
       toast.error('Erro ao carregar lembretes');
