@@ -452,7 +452,7 @@ export type Database = {
         }[]
       }
       get_user_reminders: {
-        Args: { target_user_id: string }
+        Args: { target_user_id?: string }
         Returns: {
           age_group_name: string
           created_at: string
