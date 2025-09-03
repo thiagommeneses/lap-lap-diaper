@@ -92,6 +92,51 @@ export const useReminders = () => {
     }
   };
 
+  const updateReminder = async (reminderId: string, reminderData: {
+    title?: string;
+    message?: string;
+    threshold_quantity?: number;
+  }) => {
+    try {
+      const { error } = await supabase
+        .from('reminders')
+        .update(reminderData)
+        .eq('id', reminderId);
+
+      if (error) throw error;
+      
+      setReminders(prev => 
+        prev.map(reminder => 
+          reminder.id === reminderId 
+            ? { ...reminder, ...reminderData }
+            : reminder
+        )
+      );
+      
+      toast.success('Lembrete atualizado com sucesso');
+    } catch (error) {
+      console.error('Error updating reminder:', error);
+      toast.error('Erro ao atualizar lembrete');
+    }
+  };
+
+  const deleteReminder = async (reminderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('reminders')
+        .delete()
+        .eq('id', reminderId);
+
+      if (error) throw error;
+      
+      setReminders(prev => prev.filter(reminder => reminder.id !== reminderId));
+      toast.success('Lembrete excluído com sucesso');
+    } catch (error) {
+      console.error('Error deleting reminder:', error);
+      toast.error('Erro ao excluir lembrete');
+    }
+  };
+
   const checkStockReminders = async () => {
     try {
       const { error } = await supabase.rpc('check_stock_reminders');
@@ -121,6 +166,8 @@ export const useReminders = () => {
     fetchReminders,
     markAsRead,
     createReminder,
+    updateReminder,
+    deleteReminder,
     checkStockReminders
   };
 };
