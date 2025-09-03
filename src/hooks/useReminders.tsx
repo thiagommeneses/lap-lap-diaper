@@ -85,7 +85,7 @@ export const useReminders = () => {
       if (error) throw error;
       
       toast.success('Lembrete criado com sucesso');
-      fetchReminders();
+      // fetchReminders() will be called automatically via real-time subscription
     } catch (error) {
       console.error('Error creating reminder:', error);
       toast.error('Erro ao criar lembrete');
@@ -149,6 +149,32 @@ export const useReminders = () => {
 
   useEffect(() => {
     fetchReminders();
+  }, [user]);
+
+  // Set up real-time subscription for reminders
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('reminders-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'reminders',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Reminders changed:', payload);
+          fetchReminders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   // Check for stock reminders every 5 minutes
