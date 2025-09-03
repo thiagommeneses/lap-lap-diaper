@@ -195,24 +195,37 @@ const PublicBabyProfile = () => {
   return (
     <div className="bg-background min-h-screen">
       {/* Hero Section */}
-      <div className="hero-baby py-20 min-h-[60vh] flex items-center justify-center">
-        <div className="hero-content container mx-auto px-4 text-center">
-          <div className="max-w-4xl mx-auto">
-            {/* Baby Icon */}
-            <div className="bg-gradient-baby-blue p-6 rounded-full w-24 h-24 mx-auto mb-8 flex items-center justify-center shadow-[var(--shadow-card)] animate-bounce-gentle">
-              <Baby className="w-12 h-12 text-foreground" />
+      <div className="relative overflow-hidden rounded-3xl mb-8">
+        <div 
+          className="bg-gradient-soft p-8 md:p-12 text-center relative"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8)), url(/assets/baby-hero-wI6KiNBT.jpg)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="relative z-10">
+            <div className="flex justify-center mb-4">
+              <div className="bg-gradient-baby-blue p-4 rounded-full animate-float">
+                <Baby className="w-8 h-8 text-foreground" />
+              </div>
             </div>
             
-            {/* Welcome Text */}
-            <h1 className="text-5xl md:text-6xl font-bold font-heading text-foreground mb-4">
-              Sejam bem-vindos
+            <h1 className="text-4xl md:text-5xl font-bold font-heading text-foreground mb-4">
+              {profile.title}
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-6 max-w-3xl mx-auto">
+            
+            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
               {profile.subtitle}
             </p>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {profile.welcome_message}
-            </p>
+
+            {profile.welcome_message && (
+              <div className="mb-6">
+                <p className="text-sm text-baby-blue font-medium bg-baby-blue/10 px-4 py-2 rounded-full inline-block">
+                  {profile.welcome_message}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
