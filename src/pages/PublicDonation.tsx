@@ -70,12 +70,24 @@ const PublicDonation = () => {
           setNotFound(true);
         } else {
           const profile = data[0];
+          console.log('Profile data received:', profile);
+          
           let diaperGroups: AgeGroup[] = [];
           if (profile.diaper_groups) {
             try {
               diaperGroups = typeof profile.diaper_groups === 'string' 
                 ? JSON.parse(profile.diaper_groups)
                 : profile.diaper_groups;
+              
+              console.log('Parsed diaper groups:', diaperGroups);
+              
+              // Verificar se todos os grupos têm IDs válidos
+              diaperGroups.forEach((group, index) => {
+                console.log(`Group ${index}:`, group);
+                if (!group.id) {
+                  console.error(`Group at index ${index} has no ID:`, group);
+                }
+              });
             } catch (e) {
               console.warn('Failed to parse diaper_groups:', e);
               diaperGroups = [];
@@ -102,14 +114,36 @@ const PublicDonation = () => {
   const handleDonation = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form data before validation:', donationForm);
+    console.log('Selected age_group_id:', donationForm.age_group_id);
+    console.log('Available groups:', babyInfo?.diaper_groups);
+    
     if (!donationForm.age_group_id || donationForm.quantity <= 0 || !donationForm.donor_name) {
       toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    // Verificar se age_group_id é um UUID válido
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(donationForm.age_group_id)) {
+      console.error('Invalid UUID:', donationForm.age_group_id);
+      toast.error('Erro: ID do grupo etário inválido');
       return;
     }
 
     setSubmitting(true);
 
     try {
+      console.log('Inserting donation with data:', {
+        age_group_id: donationForm.age_group_id,
+        quantity: donationForm.quantity,
+        donor_name: donationForm.donor_name,
+        donor_contact: donationForm.donor_contact,
+        donor_email: donationForm.donor_email,
+        notes: donationForm.notes,
+        created_by: null
+      });
+
       const { error } = await supabase
         .from('diaper_donations')
         .insert({
@@ -134,6 +168,7 @@ const PublicDonation = () => {
         notes: ''
       });
     } catch (error: any) {
+      console.error('Error inserting donation:', error);
       toast.error('Erro ao registrar doação: ' + error.message);
     } finally {
       setSubmitting(false);
